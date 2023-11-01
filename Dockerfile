@@ -6,16 +6,14 @@ WORKDIR /target
 
 ARG JAR_FILE=target/*.jar
 # Copy the JAR file from the build output to the image
-COPY target/school-managment-0.0.1-SNAPSHOT.jar app.jar
-
-# Expose the port that the application will run on
-EXPOSE 8085
+COPY target/school-managment-b181-0.0.1-SNAPSHOT.jar app.jar
 
 # Start the application
 CMD ["java", "-jar", "app.jar"]
 
 
 
-#docker build -t car-rental-latest .
+# docker build -t school-management-demo .
+# docker run -p 8080:8080 school-management-demo
 
 

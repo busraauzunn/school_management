@@ -115,6 +115,7 @@ public class UserService {
 				.collect(Collectors.toList());
 	}
 
+	// Normally we should return String not Response entity. Response entity class should be created in controller level.
 	public ResponseEntity<String> updateUserForUsers(UserRequestWithoutPassword userRequestWithoutPassword, HttpServletRequest request) {
 		String userName = (String) request.getAttribute("username");
 
@@ -122,8 +123,21 @@ public class UserService {
 
 		//we need to check if this user can be changed
 		methodHelper.isUserBuiltIn(user);
-		//we need to check are we changing the require properties
+		//we need to check are we changing the unique properties
+		uniquePropertyValidator.checkUniqueProperties(user,userRequestWithoutPassword);
 
-		//username > yildiz -> yildiz1
+		//implementation without using mapper builders
+		user.setUsername(userRequestWithoutPassword.getUsername());
+		user.setBirthDay(userRequestWithoutPassword.getBirthDay());
+		user.setEmail(userRequestWithoutPassword.getEmail());
+		user.setPhoneNumber(userRequestWithoutPassword.getPhoneNumber());
+		user.setBirthPlace(userRequestWithoutPassword.getBirthPlace());
+		user.setGender(userRequestWithoutPassword.getGender());
+		user.setName(userRequestWithoutPassword.getName());
+		user.setSurname(userRequestWithoutPassword.getSurname());
+		user.setSsn(userRequestWithoutPassword.getSsn());
+		userRepository.save(user);
+		String message = SuccessMessages.USER_UPDATE;
+		return  ResponseEntity.ok(message);
 	}
 }
