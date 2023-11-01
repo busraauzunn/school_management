@@ -1,7 +1,6 @@
 package com.project.schoolmanagment.security.jwt;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +23,19 @@ public class JwtUtils {
 	public boolean validateJwt(String jwtToken){
 		try {
 			Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwtToken);
+			return true;
+		} catch (ExpiredJwtException e) {
+			LOGGER.error("Jwt token is expired : {}", e.getMessage());
+		} catch (UnsupportedJwtException e) {
+			LOGGER.error("Jwt token is unsupported : {}", e.getMessage());
+		} catch (MalformedJwtException e) {
+			LOGGER.error("Jwt token is invalid : {}", e.getMessage());
+		} catch (SignatureException e) {
+			LOGGER.error("Jwt Signature is invalid : {}", e.getMessage());
+		} catch (IllegalArgumentException e) {
+			LOGGER.error("Jwt is empty : {}", e.getMessage());
 		}
+		return false;
 	}
 
 	/**
