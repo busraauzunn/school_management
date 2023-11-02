@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,6 +39,8 @@ public class UserService {
 	private final UserRoleService userRoleService;
 	private final PageableHelper pageableHelper;
 	private final MethodHelper methodHelper;
+	//this prop. should be used after security dependency usage.
+	private final PasswordEncoder passwordEncoder;
 
 	public ResponseMessage<UserResponse>saveUser(UserRequest userRequest, String userRole){
 		//handle uniqueness exceptions
@@ -68,6 +71,9 @@ public class UserService {
 			throw new ResourceNotFoundException(String.format(
 					ErrorMessages.NOT_FOUND_USER_USER_ROLE_MESSAGE,userRole));
 		}
+		//this line should be written after security
+		user.setPassword(passwordEncoder.encode(user.getPassword()));
+		//******************************************************
 		user.setIsAdvisor(false);
 		User savedUser = userRepository.save(user);
 		return ResponseMessage.<UserResponse>builder()
