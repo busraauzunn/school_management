@@ -30,19 +30,28 @@ public class WebSecurityConfig {
 
 	private final AuthEntryPointJwt unauthorizedHandler;
 
+	/**
+	 * main configuration class for spring security
+	 */
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.cors().and()
 				.csrf().disable()
+				//we are specifying the exception handling for unauthorised login try
 				.exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
 				.and()
+				//we are not keeping the session info in backend.
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 				.and()
+				//we are disabling security for some URL.s
 				.authorizeRequests().antMatchers(AUTH_WHITE_LIST).permitAll()
+				//The rest URL.s will be authenticated
 				.anyRequest().authenticated();
 
+		//when you logged-in. other requests should come from the same origin.
 		http.headers().frameOptions().sameOrigin();
 
+		//injecting the authentication provider that we will use
 		http.authenticationProvider(daoAuthenticationProvider());
 
 		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

@@ -1,7 +1,11 @@
 package com.project.schoolmanagment.service.user;
 
+import com.project.schoolmanagment.entity.concretes.user.User;
+import com.project.schoolmanagment.exeption.BadRequestException;
 import com.project.schoolmanagment.payload.mappers.UserMapper;
+import com.project.schoolmanagment.payload.messages.ErrorMessages;
 import com.project.schoolmanagment.payload.request.user.LoginRequest;
+import com.project.schoolmanagment.payload.request.user.PasswordUpdateRequest;
 import com.project.schoolmanagment.payload.response.user.LoginResponse;
 import com.project.schoolmanagment.repository.user.UserRepository;
 import com.project.schoolmanagment.security.jwt.JwtUtils;
@@ -16,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -67,4 +72,33 @@ public class AuthenticationService {
 		role.ifPresent(loginResponseBuilder::role);
 		return ResponseEntity.ok(loginResponseBuilder.build());
 	}
+
+	public void updatePassword(PasswordUpdateRequest passwordUpdateRequest, HttpServletRequest request) {
+		String userName = (String) request.getAttribute("username");
+		User user = userRepository.findByUsername(userName);
+
+		if(Boolean.TRUE.equals(user.getBuiltIn())){
+			throw new BadRequestException(ErrorMessages.NOT_PERMITTED_METHOD_MESSAGE);
+		}
+		if(!passwordEncoder.matches(passwordUpdateRequest.getOldPassword(), user.getPassword())){
+			throw new BadRequestException(ErrorMessages.PASSWORD_NOT_MATCHED);
+		}
+
+		user.setPassword(passwordEncoder.encode(passwordUpdateRequest.getNewPassword()));
+
+		userRepository.save(user);
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
