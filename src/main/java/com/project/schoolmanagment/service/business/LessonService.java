@@ -119,4 +119,15 @@ public class LessonService {
 		Lesson savedLesson = lessonRepository.save(updatedLesson);
 		return lessonMapper.mapLessonToLessonResponse(savedLesson);
 	}
+
+    public ResponseMessage<LessonResponse> getLessonById(Long id) {
+
+		Lesson lesson  = isLessonExistById(id);
+
+		return ResponseMessage.<LessonResponse>builder()
+				.object(lessonMapper.mapLessonToLessonResponse(lesson))
+				.message(SuccessMessages.LESSON_FOUND)
+				.build();
+
+    }
 }
