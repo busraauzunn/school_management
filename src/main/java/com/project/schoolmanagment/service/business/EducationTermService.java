@@ -10,7 +10,10 @@ import com.project.schoolmanagment.payload.request.business.EducationTermRequest
 import com.project.schoolmanagment.payload.response.abstracts.ResponseMessage;
 import com.project.schoolmanagment.payload.response.business.EducationTermResponse;
 import com.project.schoolmanagment.repository.business.EducationTermRepository;
+import com.project.schoolmanagment.service.helper.PageableHelper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +26,7 @@ public class EducationTermService {
 
 	private final EducationTermRepository educationTermRepository;
 	private final EducationTermMapper educationTermMapper;
+	private final PageableHelper pageableHelper;
 
 	public ResponseMessage<EducationTermResponse> saveEducationTerm(EducationTermRequest educationTermRequest) {
 		//first validation
@@ -104,5 +108,11 @@ public class EducationTermService {
 				.message(SuccessMessages.EDUCATION_TERM_DELETE)
 				.httpStatus(HttpStatus.OK)
 				.build();
+	}
+
+	public Page<EducationTermResponse> getAllEducationTermsByPage(int page, int size, String sort, String type) {
+		Pageable pageable = pageableHelper.getPageableWithProperties(page, size, sort, type);
+		return educationTermRepository.findAll(pageable)
+				.map(educationTermMapper::mapEducationTermToEducationTermResponse);
 	}
 }
