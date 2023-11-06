@@ -55,18 +55,11 @@ public class LessonController {
 		return lessonService.getAllLessonByLessonId(idSet);
 	}
 
-	//TODO
-	//Ali -> please implement findById api
-
 	@GetMapping("/findById/{id}")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'ASSISTANT_MANAGER')")
 	public ResponseMessage<LessonResponse> getLessonById(@PathVariable Long id){
-
 		return lessonService.getLessonById(id);
-
 	}
-
-
 
 	//TODO
 	//Eren -> please implement getAllLessons
