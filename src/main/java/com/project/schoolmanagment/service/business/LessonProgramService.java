@@ -11,12 +11,17 @@ import com.project.schoolmanagment.payload.request.business.LessonProgramRequest
 import com.project.schoolmanagment.payload.response.abstracts.ResponseMessage;
 import com.project.schoolmanagment.payload.response.business.LessonProgramResponse;
 import com.project.schoolmanagment.repository.business.LessonProgramRepository;
+import com.project.schoolmanagment.service.helper.PageableHelper;
 import com.project.schoolmanagment.service.validator.DateTimeValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +32,7 @@ public class LessonProgramService {
 	private final EducationTermService educationTermService;
 	private final DateTimeValidator dateTimeValidator;
 	private final LessonProgramMapper lessonProgramMapper;
+	private final PageableHelper pageableHelper;
 
 	public ResponseMessage<LessonProgramResponse> saveLessonProgram(LessonProgramRequest lessonProgramRequest) {
 		//validate if these lessonId.s really exist
@@ -47,6 +53,56 @@ public class LessonProgramService {
 				.message(SuccessMessages.LESSON_PROGRAM_SAVE)
 				.object(lessonProgramMapper.mapLessonProgramToLessonProgramResponse(savedLessonProgram))
 				.httpStatus(HttpStatus.CREATED)
+				.build();
+	}
+
+	public List<LessonProgramResponse> getAllLessonProgramByList() {
+		return lessonProgramRepository
+				.findAll()
+				.stream()
+				.map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
+				.collect(Collectors.toList());
+	}
+
+	public Page<LessonProgramResponse> getAllLessonProgramsByPage(int page, int size, String sort, String type) {
+		Pageable pageable = pageableHelper.getPageableWithProperties(page, size, sort, type);
+		return lessonProgramRepository.findAll(pageable)
+				.map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse);
+	}
+
+	public LessonProgramResponse getLessonProgramById(Long id) {
+		//validate if we really have this lesson program
+		LessonProgram lessonProgram = isLessonProgramExistById(id);
+		return lessonProgramMapper.mapLessonProgramToLessonProgramResponse(lessonProgram);
+	}
+
+
+	private LessonProgram isLessonProgramExistById(Long id){
+		return lessonProgramRepository.findById(id).orElseThrow(
+				()-> new ResourceNotFoundException(String.format(ErrorMessages.NOT_FOUND_LESSON_PROGRAM_MESSAGE,id)));
+	}
+
+	public List<LessonProgramResponse> getAllUnassigned() {
+		return lessonProgramRepository.findByUsers_IdNull()
+				.stream()
+				.map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
+				.collect(Collectors.toList());
+	}
+
+	public List<LessonProgramResponse>getAllLessonProgramsUnAssigned(){
+		return lessonProgramRepository.findByUsers_IdNotNull()
+				.stream()
+				.map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
+				.collect(Collectors.toList());
+	}
+
+	public ResponseMessage deleteLessonProgramById(Long id) {
+		//validate first!
+		isLessonProgramExistById(id);
+		lessonProgramRepository.deleteById(id);
+		return ResponseMessage.builder()
+				.message(SuccessMessages.LESSON_PROGRAM_DELETE)
+				.httpStatus(HttpStatus.OK)
 				.build();
 	}
 }
