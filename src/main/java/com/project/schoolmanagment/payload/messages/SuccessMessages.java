@@ -27,4 +27,15 @@ public class SuccessMessages {
 	public static final String LESSON_PROGRAM_ADD_TO_TEACHER = "Lesson Program added to teacher";
 	public static final String LESSON_PROGRAM_ADD_TO_STUDENT = "Lesson Program added to student";
 
+	//Student
+	public static final String STUDENT_SAVE = "Student is Saved";
+	public static final String STUDENT_UPDATE = "Student is Updated Successfully";
+
+	//Teacher
+	public static final String TEACHER_SAVE = "Teacher is Saved";
+	public static final String TEACHER_UPDATE = "Teacher is Updated Successfully";
+
+	//Advisor teacher
+	public static final String ADVISOR_TEACHER_SAVE = "Advisor Teacher is Saved";
+
 }

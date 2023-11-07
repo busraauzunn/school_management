@@ -3,6 +3,7 @@ package com.project.schoolmanagment.service.business;
 import com.project.schoolmanagment.entity.concretes.businnes.EducationTerm;
 import com.project.schoolmanagment.entity.concretes.businnes.Lesson;
 import com.project.schoolmanagment.entity.concretes.businnes.LessonProgram;
+import com.project.schoolmanagment.exeption.BadRequestException;
 import com.project.schoolmanagment.exeption.ResourceNotFoundException;
 import com.project.schoolmanagment.payload.mappers.LessonProgramMapper;
 import com.project.schoolmanagment.payload.messages.ErrorMessages;
@@ -104,5 +105,13 @@ public class LessonProgramService {
 				.message(SuccessMessages.LESSON_PROGRAM_DELETE)
 				.httpStatus(HttpStatus.OK)
 				.build();
+	}
+
+	public Set<LessonProgram>getLessonProgramById(Set<Long>lessonIdSet){
+		Set<LessonProgram>lessonPrograms = lessonProgramRepository.getLessonProgramByUsersUsername(lessonIdSet);
+		if(lessonPrograms.isEmpty()){
+			throw new BadRequestException(ErrorMessages.NOT_FOUND_LESSON_PROGRAM_MESSAGE);
+		}
+		return lessonPrograms;
 	}
 }

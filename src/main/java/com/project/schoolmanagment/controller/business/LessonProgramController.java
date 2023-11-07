@@ -55,6 +55,7 @@ public class LessonProgramController {
 	}
 
 
+	//TODO need to check in postman
 	@GetMapping("/getAllAssigned")
 	@PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER','TEACHER','STUDENT')")
 	public List<LessonProgramResponse>getAllAssigned(){
