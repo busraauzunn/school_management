@@ -3,12 +3,15 @@ package com.project.schoolmanagment.service.user;
 import com.project.schoolmanagment.entity.concretes.businnes.LessonProgram;
 import com.project.schoolmanagment.entity.concretes.user.User;
 import com.project.schoolmanagment.entity.enums.RoleType;
+import com.project.schoolmanagment.exeption.BadRequestException;
 import com.project.schoolmanagment.payload.mappers.UserMapper;
+import com.project.schoolmanagment.payload.messages.ErrorMessages;
 import com.project.schoolmanagment.payload.messages.SuccessMessages;
 import com.project.schoolmanagment.payload.request.user.ChooseLessonTeacherRequest;
 import com.project.schoolmanagment.payload.request.user.TeacherRequest;
 import com.project.schoolmanagment.payload.response.abstracts.ResponseMessage;
 import com.project.schoolmanagment.payload.response.user.TeacherResponse;
+import com.project.schoolmanagment.payload.response.user.UserResponse;
 import com.project.schoolmanagment.repository.user.UserRepository;
 import com.project.schoolmanagment.service.business.LessonProgramService;
 import com.project.schoolmanagment.service.helper.MethodHelper;
@@ -19,7 +22,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -51,7 +56,7 @@ public class TeacherService {
 		teacher.setLessonProgramList(lessonProgramSet);
 		teacher.setPassword(passwordEncoder.encode(teacher.getPassword()));
 		//is advisory teacher
-		teacher.setIsAdvisor(teacherRequest.isAdvisorTeacher());
+		teacher.setIsAdvisor(teacherRequest.getIsAdvisorTeacher());
 		User savedTeacher = userRepository.save(teacher);
 		return ResponseMessage.<TeacherResponse>builder()
 				.message(SuccessMessages.TEACHER_SAVE)
@@ -93,6 +98,9 @@ public class TeacherService {
 		//the lesson programs that wanted to be updated
 		Set<LessonProgram>lessonPrograms = lessonProgramService.getLessonProgramById(teacherRequest.getLessonProgramId());//4,8,9
 		Set<LessonProgram>teacherExistingLessonProgram = teacher.getLessonProgramList();//1,2,3
+		if(lessonPrograms.equals(teacherExistingLessonProgram)){
+			throw new BadRequestException(ErrorMessages.LESSON_PROGRAM_THE_SAME);
+		}
 		//just validating the new ones
 		dateTimeValidator.checkDuplicateLessonPrograms(lessonPrograms);
 		teacherExistingLessonProgram.addAll(lessonPrograms);
@@ -107,6 +115,35 @@ public class TeacherService {
 				.message(SuccessMessages.LESSON_PROGRAM_ADD_TO_TEACHER)
 				.httpStatus(HttpStatus.OK)
 				.object(userMapper.mapUserToTeacherResponse(updatedTeacher))
+				.build();
+	}
+
+	public List<UserResponse> getAllAdvisorTeacher() {
+		return userRepository.findAllByAdvisorTeacher(true)
+				.stream()
+				.map(userMapper::mapUserToUserResponse)
+				.collect(Collectors.toList());
+	}
+
+	public ResponseMessage<UserResponse> deleteAdvisorTeacherById(Long id) {
+		//is user really exist
+		User teacher = methodHelper.isUserExist(id);
+		//is user really a teacher
+		methodHelper.checkRole(teacher,RoleType.TEACHER);
+		//is user really a advisorId
+		methodHelper.checkAdvisor(teacher);
+
+		teacher.setIsAdvisor(false);
+		userRepository.save(teacher);
+		List<User>allStudents = userRepository.findByAdvisorTeacherId(id);
+		//we need to set this deleted advisor teacher info from students
+		if(!allStudents.isEmpty()){
+			allStudents.forEach(student ->student.setAdvisorTeacherId(null));
+		}
+		return ResponseMessage.<UserResponse>builder()
+				.message(SuccessMessages.ADVISOR_TEACHER_DELETE)
+				.object(userMapper.mapUserToUserResponse(teacher))
+				.httpStatus(HttpStatus.OK)
 				.build();
 	}
 }

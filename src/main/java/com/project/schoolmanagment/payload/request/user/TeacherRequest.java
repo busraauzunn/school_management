@@ -19,7 +19,7 @@ public class TeacherRequest extends BaseUserRequest {
 	private Set<Long> lessonsProgramIdList;
 
 	@NotNull(message = "Please select isAdvisor teacher")
-	private boolean isAdvisorTeacher;
+	private Boolean isAdvisorTeacher;
 
 
 

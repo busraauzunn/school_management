@@ -97,7 +97,7 @@ public class UserMapper {
 				.password(teacherRequest.getPassword())
 				.phoneNumber(teacherRequest.getPhoneNumber())
 				.email(teacherRequest.getEmail())
-				.isAdvisor(teacherRequest.isAdvisorTeacher())
+				.isAdvisor(teacherRequest.getIsAdvisorTeacher())
 				.builtIn(teacherRequest.getBuiltIn())
 				.gender(teacherRequest.getGender())
 				.build();

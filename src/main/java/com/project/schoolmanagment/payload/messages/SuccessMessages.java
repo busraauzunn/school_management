@@ -37,5 +37,6 @@ public class SuccessMessages {
 
 	//Advisor teacher
 	public static final String ADVISOR_TEACHER_SAVE = "Advisor Teacher is Saved";
+	public static final String ADVISOR_TEACHER_DELETE = "Advisor Teacher is Deleted";
 
 }
