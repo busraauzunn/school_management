@@ -1,5 +1,6 @@
 package com.project.schoolmanagment.controller.user;
 
+import com.project.schoolmanagment.payload.request.user.ChooseLessonProgramWithId;
 import com.project.schoolmanagment.payload.request.user.StudentRequest;
 import com.project.schoolmanagment.payload.request.user.StudentRequestWithoutPassword;
 import com.project.schoolmanagment.payload.response.abstracts.ResponseMessage;
@@ -34,13 +35,33 @@ public class StudentController {
 		return studentService.updateStudentWithoutPassword(studentRequestWithoutPassword,request);
 	}
 
-	@PutMapping("update/{id}")
+	@PutMapping("/update/{id}")
 	@PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
 	public ResponseMessage<StudentResponse>updateStudentForManagers(
 			@PathVariable Long id,
 			@RequestBody @Valid StudentRequest studentRequest){
 		return studentService.updateStudentForManagers(id,studentRequest);
 	}
+
+	@PostMapping("/addLessonProgramToStudent")
+	@PreAuthorize("hasAnyAuthority('STUDENT')")
+	public ResponseMessage<StudentResponse>addLessonProgram(HttpServletRequest request,
+	                                                         @RequestBody @Valid ChooseLessonProgramWithId chooseLessonProgramWithId){
+		return studentService.addLessonProgram(request,chooseLessonProgramWithId);
+	}
+
+	@GetMapping("/changeStatus")
+	@PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
+	public ResponseMessage changeStatusOfStudent(@RequestParam Long id,@RequestParam boolean status){
+		return studentService.changeStatusOfStudent(id,status);
+	}
+
+
+	//TODO
+	// getAllByPage -> burhan
+	// findById -> hikmet
+	// getAllByList (active-passive as parameter) by list -> hikmet
+	// getAllByList (parameter-username contains as parameter) -> burhan
 
 
 

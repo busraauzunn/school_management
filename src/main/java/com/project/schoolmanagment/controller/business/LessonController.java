@@ -62,7 +62,7 @@ public class LessonController {
 	}
 
 	//TODO
-	//Eren -> please implement getAllLessons
+	//ALI -> please implement getAllLessons
 
 
 	@PutMapping ("/update/{lessonId}")
