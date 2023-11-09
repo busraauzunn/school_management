@@ -90,9 +90,10 @@ public class LessonProgramService {
 				.collect(Collectors.toList());
 	}
 
-	public List<LessonProgramResponse>getAllLessonProgramsUnAssigned(){
+	public List<LessonProgramResponse> getAllLessonProgramsAssigned(){
 		return lessonProgramRepository.findByUsers_IdNotNull()
 				.stream()
+				.distinct()
 				.map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
 				.collect(Collectors.toList());
 	}
