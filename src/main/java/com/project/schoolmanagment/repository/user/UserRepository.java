@@ -1,6 +1,7 @@
 package com.project.schoolmanagment.repository.user;
 
 import com.project.schoolmanagment.entity.concretes.user.User;
+import com.project.schoolmanagment.entity.enums.RoleType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -33,5 +34,12 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
 	List<User>findByAdvisorTeacherId(Long id);
 
+
+	@Query(value = "select (count (u)>0) from User u where u.userRole.roleType = ?1")
+	boolean findUsersByRole(RoleType roleType);
+
+
+	@Query("SELECT MAX (u.studentNumber) from User u")
+	int getMaxStudentNumber();
 
 }
