@@ -11,8 +11,10 @@ import java.util.List;
 public interface StudentInfoRepository extends JpaRepository<StudentInfo,Long> {
 
 
-	@Query("select s from StudentInfo s where User.id IN :studentId")
+	//@Query("select s from StudentInfo s where StudentInfo.student.id = :studentId")
 	List<StudentInfo>getAllByStudentId_Id(Long studentId);
+
+	boolean existsByIdEquals(Long id);
 
 
 

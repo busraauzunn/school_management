@@ -7,6 +7,7 @@ import com.project.schoolmanagment.entity.concretes.user.User;
 import com.project.schoolmanagment.entity.enums.Note;
 import com.project.schoolmanagment.entity.enums.RoleType;
 import com.project.schoolmanagment.exeption.ConflictException;
+import com.project.schoolmanagment.exeption.ResourceNotFoundException;
 import com.project.schoolmanagment.payload.mappers.StudentInfoMapper;
 import com.project.schoolmanagment.payload.messages.ErrorMessages;
 import com.project.schoolmanagment.payload.messages.SuccessMessages;
@@ -15,8 +16,12 @@ import com.project.schoolmanagment.payload.response.abstracts.ResponseMessage;
 import com.project.schoolmanagment.payload.response.business.StudentInfoResponse;
 import com.project.schoolmanagment.repository.business.StudentInfoRepository;
 import com.project.schoolmanagment.service.helper.MethodHelper;
+import com.project.schoolmanagment.service.helper.PageableHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,6 +35,7 @@ public class StudentInfoService {
 	private final LessonService lessonService;
 	private final EducationTermService educationTermService;
 	private final StudentInfoMapper studentInfoMapper;
+	private final PageableHelper pageableHelper;
 
 	@Value("${midterm.exam.impact.percentage}")
 	private Double midtermExamPercentage;
@@ -70,9 +76,9 @@ public class StudentInfoService {
 		StudentInfo savedStudentInfo = studentInfoRepository.save(studentInfo);
 		return ResponseMessage.<StudentInfoResponse>builder()
 				.message(SuccessMessages.STUDENT_INFO_SAVE)
-				.object(studentInfoMapper)
-
-
+				.object(studentInfoMapper.mapStudentInfoToStudentInfoResponse(savedStudentInfo))
+				.httpStatus(HttpStatus.OK)
+				.build();
 	}
 
 	private void isDuplicatedLessonAndInfo(Long studentId, String lessonName){
@@ -110,8 +116,31 @@ public class StudentInfoService {
 	}
 
 
+	public ResponseMessage deleteById(Long studentInfoId) {
+		//validate if studentInfoExist
+		StudentInfo studentInfo = isStudentInfoExist(studentInfoId);
+		studentInfoRepository.deleteById(studentInfoId);
+		return ResponseMessage.builder()
+				.message(SuccessMessages.STUDENT_INFO_DELETE)
+				.httpStatus(HttpStatus.OK)
+				.build();
+	}
 
 
+	//practising purposes, we have added one more query which is in reality not needed at all
+	public StudentInfo isStudentInfoExist(Long id){
+		boolean isExist = studentInfoRepository.existsByIdEquals(id);
+		if(!isExist){
+			throw new ResourceNotFoundException(String.format(ErrorMessages.STUDENT_INFO_NOT_FOUND,id));
+		} else {
+			return studentInfoRepository.findById(id).get();
+		}
+	}
 
-
+	public Page<StudentInfoResponse> getStudentInfoByPage(int page, int size, String sort, String type) {
+		Pageable pageable = pageableHelper.getPageableWithProperties(page, size, sort, type);
+		return studentInfoRepository
+				.findAll(pageable)
+				.map(studentInfoMapper::mapStudentInfoToStudentInfoResponse);
+	}
 }

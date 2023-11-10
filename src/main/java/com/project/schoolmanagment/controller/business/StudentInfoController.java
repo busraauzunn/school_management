@@ -5,11 +5,9 @@ import com.project.schoolmanagment.payload.response.abstracts.ResponseMessage;
 import com.project.schoolmanagment.payload.response.business.StudentInfoResponse;
 import com.project.schoolmanagment.service.business.StudentInfoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -27,5 +25,26 @@ public class StudentInfoController {
 	                                                           @RequestBody @Valid StudentInfoRequest studentInfoRequest){
 			return studentInfoService.saveStudentInfo(request,studentInfoRequest);
 	}
+
+	@DeleteMapping("/delete/{studentInfoId}")
+	@PreAuthorize("hasAnyAuthority('ADMIN','TEACHER')")
+	public ResponseMessage delete (@PathVariable Long studentInfoId){
+		return studentInfoService.deleteById(studentInfoId);
+	}
+
+
+	@GetMapping("/getAllStudentInfoByPage")
+	@PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASISTANT_MANAGER')")
+	public Page<StudentInfoResponse> getStudentInfoByPage(
+			@RequestParam(value = "page") int page,
+			@RequestParam(value = "size") int size,
+			@RequestParam(value = "sort") String sort,
+			@RequestParam(value = "type") String type){
+		return studentInfoService.getStudentInfoByPage(page,size,sort,type);
+	}
+
+
+
+
 
 }
