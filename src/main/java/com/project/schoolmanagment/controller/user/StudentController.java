@@ -60,8 +60,6 @@ public class StudentController {
     }
 
 
-    //TODO
-    // getAllByPage -> burhan
     @GetMapping("/getAllStudentByPage/{userRole}")
     @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
     public ResponseEntity<Page<StudentResponse>> getAllStudentByPage(
@@ -75,8 +73,6 @@ public class StudentController {
         return new ResponseEntity<>(studentResponse, HttpStatus.OK);
     }
 
-    //TODO
-    // getAllByList (parameter-username contains as parameter) -> burhan
     @GetMapping("/getAllStudentByUsernameContains")
     @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
     public ResponseEntity<List<StudentResponse>> getAllStudentByUsernameContains(@RequestParam String username) {
