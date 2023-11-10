@@ -2,11 +2,14 @@ package com.project.schoolmanagment.service.business;
 
 import com.project.schoolmanagment.entity.concretes.businnes.EducationTerm;
 import com.project.schoolmanagment.entity.concretes.businnes.Lesson;
+import com.project.schoolmanagment.entity.concretes.businnes.StudentInfo;
 import com.project.schoolmanagment.entity.concretes.user.User;
 import com.project.schoolmanagment.entity.enums.Note;
 import com.project.schoolmanagment.entity.enums.RoleType;
 import com.project.schoolmanagment.exeption.ConflictException;
+import com.project.schoolmanagment.payload.mappers.StudentInfoMapper;
 import com.project.schoolmanagment.payload.messages.ErrorMessages;
+import com.project.schoolmanagment.payload.messages.SuccessMessages;
 import com.project.schoolmanagment.payload.request.business.StudentInfoRequest;
 import com.project.schoolmanagment.payload.response.abstracts.ResponseMessage;
 import com.project.schoolmanagment.payload.response.business.StudentInfoResponse;
@@ -26,6 +29,7 @@ public class StudentInfoService {
 	private final MethodHelper methodHelper;
 	private final LessonService lessonService;
 	private final EducationTermService educationTermService;
+	private final StudentInfoMapper studentInfoMapper;
 
 	@Value("${midterm.exam.impact.percentage}")
 	private Double midtermExamPercentage;
@@ -48,11 +52,25 @@ public class StudentInfoService {
 		//REQUREMENT -> a student may have only one studentInfo related to one lesson
 		isDuplicatedLessonAndInfo(studentInfoRequest.getStudentId(), lesson.getLessonName());
 		//calculate the average note and get the suitable note
+		Double averageNote = calculateAverageNote(  studentInfoRequest.getMidtermExam(),
+				studentInfoRequest.getFinalExam());
 
-		Note note = checkLetterGrade(calculateAverageNote(  studentInfoRequest.getMidtermExam(),
-															studentInfoRequest.getFinalExam()));
+		Note note = checkLetterGrade(averageNote);
 
 		// map DTO -> domainObject
+		StudentInfo studentInfo = studentInfoMapper.mapStudentInfoRequestToStudentInfo(
+				studentInfoRequest,
+				note,
+				averageNote);
+		//set missing properties
+		studentInfo.setStudent(student);
+		studentInfo.setEducationTerm(educationTerm);
+		studentInfo.setTeacher(teacher);
+		studentInfo.setLesson(lesson);
+		StudentInfo savedStudentInfo = studentInfoRepository.save(studentInfo);
+		return ResponseMessage.<StudentInfoResponse>builder()
+				.message(SuccessMessages.STUDENT_INFO_SAVE)
+				.object(studentInfoMapper)
 
 
 	}
