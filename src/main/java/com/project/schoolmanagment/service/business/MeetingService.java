@@ -2,6 +2,7 @@ package com.project.schoolmanagment.service.business;
 
 import com.project.schoolmanagment.entity.concretes.businnes.Meet;
 import com.project.schoolmanagment.entity.concretes.user.User;
+import com.project.schoolmanagment.entity.enums.RoleType;
 import com.project.schoolmanagment.exeption.ConflictException;
 import com.project.schoolmanagment.payload.mappers.MeetingMapper;
 import com.project.schoolmanagment.payload.messages.ErrorMessages;
@@ -50,6 +51,10 @@ public class MeetingService {
 							meetingRequest.getStopTime());
 
 		List<User>students = userService.findUsersByIdArray(meetingRequest.getStudentIds());
+		//validate are they really student
+		for (User user:students){
+			methodHelper.checkRole(user, RoleType.STUDENT);
+		}
 
 		Meet meet = meetingMapper.mapMeetRequestToMeet(meetingRequest);
 		meet.setStudentList(students);
