@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -63,6 +64,12 @@ public class LessonController {
 
 	//TODO
 	//ALI -> please implement getAllLessons
+	@GetMapping("/findAllLessons")
+	@PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
+	public List<LessonResponse> getAllLessons(){
+		return lessonService.getAllLessons();
+
+	}
 
 
 	@PutMapping ("/update/{lessonId}")
