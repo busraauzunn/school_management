@@ -214,4 +214,8 @@ public class StudentInfoService {
 				.map(studentInfoMapper::mapStudentInfoToStudentInfoResponse)
 				.collect(Collectors.toList());
 	}
+
+	public StudentInfoResponse findById(Long id) {
+		return studentInfoMapper.mapStudentInfoToStudentInfoResponse(isStudentInfoExist(id));
+	}
 }
