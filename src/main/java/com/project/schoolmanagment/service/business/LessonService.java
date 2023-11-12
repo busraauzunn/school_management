@@ -17,7 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -131,18 +130,4 @@ public class LessonService {
 				.build();
 
     }
-
-
-	public List<LessonResponse> getAllLessons() {
-		List<Lesson> lessons = lessonRepository.findAll();
-
-		if(lessons.isEmpty()){
-			throw new ResourceNotFoundException(ErrorMessages.NO_LESSONS);
-		}
-
-		return lessons.stream()
-				.map(lessonMapper::mapLessonToLessonResponse)
-				.collect(Collectors.toList());
-	}
-
 }
