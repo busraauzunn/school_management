@@ -18,11 +18,11 @@ import com.project.schoolmanagment.service.user.UserService;
 import com.project.schoolmanagment.service.validator.DateTimeValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -77,7 +77,7 @@ public class MeetingService {
 
 		//try to understand if it is student or teacher and get all meetings
 		if(Boolean.TRUE.equals(methodHelper.isUserExist(userId).getIsAdvisor())) {
-			meets = meetingRepository.findByAdvisoryTeacher_IdEquals(userId);
+			meets = meetingRepository.getByAdvisoryTeacher_IdEquals(userId);
 		} else meets = meetingRepository.findByStudentList_IdEquals(userId);
 
 		//TODO bug has been found -> when user try to update the meeting with only student ID.s it returns a conflict exception
@@ -173,9 +173,40 @@ public class MeetingService {
 				(meet.getAdvisoryTeacher().getAdvisorTeacherId()!=(user.getId()))){
 				throw new BadRequestException(ErrorMessages.NOT_PERMITTED_METHOD_MESSAGE);
 		}
-
-
-
 	}
 
+	public ResponseEntity<List<MeetingResponse>> getAllMeetByTeacher(HttpServletRequest request) {
+		//get username from header/attribute
+		String username = (String) request.getAttribute("username");
+		//get user from db
+		User advisorTeacher = methodHelper.isUserExistByUsername(username);
+		//validate teacher is advisor or not
+		methodHelper.checkAdvisor(advisorTeacher);
+
+		List<MeetingResponse>meetResponseList =
+				meetingRepository.findAll()
+						.stream()
+						.filter(x->x.getAdvisoryTeacher().getId()== advisorTeacher.getId())
+						.map(meetingMapper::mapMeetToMeetingResponse)
+						.collect(Collectors.toList());
+		return ResponseEntity.ok(meetResponseList);
+		//TODO query does not work as expected- CHECK
+//		List<MeetingResponse>meetResponseList =
+//				meetingRepository.getByAdvisoryTeacher_IdEquals(advisorTeacher.getAdvisorTeacherId())
+//						.stream()
+//						.map(meetingMapper::mapMeetToMeetingResponse)
+//						.collect(Collectors.toList());
+//		return ResponseEntity.ok(meetResponseList);
+	}
+
+	public ResponseEntity<List<MeetingResponse>> getAllMeetByStudent(HttpServletRequest request) {
+		String username = (String) request.getAttribute("username");
+		User student = methodHelper.isUserExistByUsername(username);
+		List<MeetingResponse>meetResponseList =
+				meetingRepository.findByStudentList_IdEquals(student.getId())
+						.stream()
+						.map(meetingMapper::mapMeetToMeetingResponse)
+						.collect(Collectors.toList());
+		return ResponseEntity.ok(meetResponseList);
+	}
 }
