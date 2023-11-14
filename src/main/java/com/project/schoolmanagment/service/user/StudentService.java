@@ -185,4 +185,20 @@ public class StudentService {
     }
 
 
+    public ResponseMessage<StudentResponse> getStudentById(Long id) {
+        User student = methodHelper.isUserExist(id);
+        User existStudent = userRepository.findByIdAndRoleType(id);
+        return ResponseMessage.<StudentResponse>builder()
+                .object(userMapper.mapUserToStudentResponse(existStudent))
+                .message(SuccessMessages.STUDENT_FOUND)
+                .build();
+
+    }
+
+    public List<StudentResponse> getAllStudentByList(boolean isActive) {
+        List<User> users = userRepository.findAllByIsActive(isActive);
+        return users.stream()
+                .map(userMapper::mapUserToStudentResponse)
+                .collect(Collectors.toList());
+    }
 }

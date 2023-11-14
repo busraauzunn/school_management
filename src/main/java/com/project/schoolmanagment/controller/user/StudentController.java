@@ -79,9 +79,17 @@ public class StudentController {
         return ResponseEntity.ok(studentService.getAllStudentByUsernameContains(username));
     }
 
-    //TODO
-    // findById -> hikmet
-    // getAllByList (active-passive as parameter) by list -> hikmet
+    @GetMapping("/findById/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
+    public ResponseMessage<StudentResponse> getStudentById(@PathVariable Long id){
+        return studentService.getStudentById(id);
+    }
+
+    @GetMapping("/getAllStudentByList")
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
+    public ResponseEntity<List<StudentResponse>> getAllStudentByList(@RequestParam boolean isActive){
+        return ResponseEntity.ok(studentService.getAllStudentByList(isActive));
+    }
 
 
 }
