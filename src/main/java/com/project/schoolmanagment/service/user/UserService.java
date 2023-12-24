@@ -49,6 +49,30 @@ public class UserService {
 				userRequest.getSsn(),
 				userRequest.getPhoneNumber(),
 				userRequest.getEmail());
+		
+			//is user really exist
+			User teacher = methodHelper.isUserExist(id);
+			//is user really a teacher
+			methodHelper.checkRole(teacher,RoleType.TEACHER);
+			//is user really a advisorId
+			methodHelper.checkAdvisor(teacher);
+
+			teacher.setIsAdvisor(false);
+			
+			
+			userRepository.save(teacher);
+			List<User>allStudents = userRepository.findByAdvisorTeacherId(id);
+			//we need to set this deleted advisor teacher info from students
+			if(!allStudents.isEmpty()){
+				allStudents.forEach(student ->student.setAdvisorTeacherId(null));
+			}
+			return ResponseMessage.<UserResponse>builder()
+					.message(SuccessMessages.ADVISOR_TEACHER_DELETE)
+					.object(userMapper.mapUserToUserResponse(teacher))
+					.httpStatus(HttpStatus.OK)
+					.build();
+			
+			//***********************
 
 
 		//map DTO -> Entity (domain object)
