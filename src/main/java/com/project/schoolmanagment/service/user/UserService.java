@@ -63,6 +63,29 @@ public class UserService {
 			}
 			//give the role of admin to this user
 			user.setUserRole(userRoleService.getUserRole(RoleType.ADMIN));
+
+					String userName = (String) request.getAttribute("username");
+
+		User user = userRepository.findByUsername(userName);
+
+		//we need to check if this user can be changed
+		methodHelper.isUserBuiltIn(user);
+		//we need to check are we changing the unique properties
+		uniquePropertyValidator.checkUniqueProperties(user,userRequestWithoutPassword);
+
+		//implementation without using mapper builders
+		user.setUsername(userRequestWithoutPassword.getUsername());
+		user.setBirthDay(userRequestWithoutPassword.getBirthDay());
+		user.setEmail(userRequestWithoutPassword.getEmail());
+		user.setPhoneNumber(userRequestWithoutPassword.getPhoneNumber());
+		user.setBirthPlace(userRequestWithoutPassword.getBirthPlace());
+		user.setGender(userRequestWithoutPassword.getGender());
+		user.setName(userRequestWithoutPassword.getName());
+		user.setSurname(userRequestWithoutPassword.getSurname());
+		user.setSsn(userRequestWithoutPassword.getSsn());
+		userRepository.save(user);
+		String message = SuccessMessages.USER_UPDATE;
+		return  ResponseEntity.ok(message);
 		} else if(userRole.equalsIgnoreCase("Dean")){
 			user.setUserRole(userRoleService.getUserRole(RoleType.MANAGER));
 		} else if (userRole.equalsIgnoreCase("ViceDean")) {
