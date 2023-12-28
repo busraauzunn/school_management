@@ -14,4 +14,6 @@ import org.springframework.context.annotation.Configuration;
 @SecurityScheme(name = "Bearer", type = SecuritySchemeType.HTTP, scheme ="Bearer")
 public class OpenApiConfig {
 	//this is my remote directory manual changes
+	
+	//this is my another changes from local env.
 }
