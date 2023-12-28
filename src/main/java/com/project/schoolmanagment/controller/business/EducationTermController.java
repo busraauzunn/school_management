@@ -36,6 +36,7 @@ public class EducationTermController {
 	@PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER','TEACHER')")
 	public EducationTermResponse findEducationTermById(@PathVariable Long id){
 		return educationTermService.findEducationTermById(id);
+		
 	}
 
 	@PutMapping("/update/{id}")
