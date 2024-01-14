@@ -13,6 +13,7 @@ public class SchoolManagementApplication {
     public static void main(String[] args) {
         SpringApplication.run(SchoolManagementApplication.class, args);
         //this is our first day
+        //this is our first git-push for back-end 
     }
 
 }
