@@ -4,7 +4,7 @@ services:
     container_name: spring-boot-school-management
     image: sametyaprak/school-management-demo:latest
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/school_management_b181
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/school_management_b199
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=changeme
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
@@ -59,10 +59,10 @@ services:
     command: |
       sh -c '
         sleep 10 # Wait for the Postgres container to start, adjust as needed
-        if psql -h postgres -U postgres -lqt | cut -d \| -f 1 | grep -qw "school_management_b181"; then
-          echo "Database school_management_b181 already exists."
+        if psql -h postgres -U postgres -lqt | cut -d \| -f 1 | grep -qw "school_management_b199"; then
+          echo "Database school_management_b199 already exists."
         else
-          psql -h postgres -U postgres -c "CREATE DATABASE school_management_b181"
+          psql -h postgres -U postgres -c "CREATE DATABASE school_management_b199"
         fi
       '
     networks:
