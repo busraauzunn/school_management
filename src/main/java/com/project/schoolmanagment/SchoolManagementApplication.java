@@ -14,6 +14,7 @@ public class SchoolManagementApplication {
         SpringApplication.run(SchoolManagementApplication.class, args);
         //this is our first day
         //this is our first git-push for back-end 
+        //application properties file has changed, lets see what will happen
     }
 
 }
