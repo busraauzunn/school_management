@@ -20,6 +20,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * The Meet class represents a meeting.
+ * It contains information about the meeting, such as the description, date, start time,
+ * stop time, advisory teacher, and students attending the meeting.
+ */
 @Entity
 @Data
 @AllArgsConstructor

@@ -27,6 +27,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * The LessonProgram class represents a lesson program.
+ * It contains information about the lesson program, such as the day, start time, stop time,
+ * associated lessons, education term, and users enrolled in the program.
+ */
 @Entity
 @Getter
 @Setter

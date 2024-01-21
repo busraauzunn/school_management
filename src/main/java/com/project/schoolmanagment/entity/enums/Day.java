@@ -1,5 +1,8 @@
 package com.project.schoolmanagment.entity.enums;
 
+/**
+ * The Day enum represents the days of the week.
+ */
 public enum Day {
   
   //in java all constant (enum, final ect.) properties written in UPPERCASE.

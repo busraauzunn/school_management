@@ -29,6 +29,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * The User class represents a user in the system.
+ * It contains information about the user, such as their username,
+ * social security number, name, surname, date of birth, birth place,
+ * password, phone number, email, built-in status, mother's name,
+ * father's name, student number, active status, advisor status,
+ * advisor teacher ID, gender, user role, lesson programs and meeting attendance.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

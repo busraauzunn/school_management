@@ -14,6 +14,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * The Lesson class represents a lesson.
+ * It contains information about the lesson, such as the name,
+ * credit score, compulsory status, and the lesson programs associated with it.
+ */
 @Entity
 @Data
 @AllArgsConstructor

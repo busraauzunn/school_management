@@ -21,6 +21,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * The EducationTerm class represents an education term.
+ * It contains information about the term, start and end dates,
+ * last registration date, and the lesson programs associated with the term.
+ */
 @Entity
 @Data
 @AllArgsConstructor
