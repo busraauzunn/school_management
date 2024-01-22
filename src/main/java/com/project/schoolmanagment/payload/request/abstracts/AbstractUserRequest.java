@@ -8,7 +8,15 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
+@SuperBuilder
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public abstract class AbstractUserRequest {
 
   @NotNull(message = "Please enter your username")
