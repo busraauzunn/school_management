@@ -65,7 +65,7 @@ public class LessonProgram {
   
   //TODO learn about all cascade ops. cases
   @ManyToOne(cascade = CascadeType.PERSIST)
-  private EducationTerm term;
+  private EducationTerm educationTerm;
   
   @JsonProperty(access = Access.READ_ONLY)
   @ManyToMany(mappedBy = "lessonProgramList",fetch = FetchType.EAGER)

@@ -7,10 +7,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.project.schoolmanagment.entity.concretes.businnes.LessonProgram;
 import com.project.schoolmanagment.entity.concretes.businnes.Meet;
+import com.project.schoolmanagment.entity.concretes.businnes.StudentInfo;
 import com.project.schoolmanagment.entity.enums.Gender;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -21,6 +23,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -94,6 +97,9 @@ public class User {
   @OneToOne
   @JsonProperty(access = Access.WRITE_ONLY)
   private UserRole userRole;
+  
+  @OneToMany(mappedBy = "teacher",cascade = CascadeType.REMOVE)
+  private List<StudentInfo>studentInfos;
   
   @ManyToMany
   @JoinTable(name = "user_lessonProgram",
