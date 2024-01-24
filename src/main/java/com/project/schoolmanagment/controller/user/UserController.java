@@ -4,11 +4,8 @@ import com.project.schoolmanagment.payload.request.user.UserRequest;
 import com.project.schoolmanagment.payload.response.businnes.ResponseMessage;
 import com.project.schoolmanagment.payload.response.user.UserResponse;
 import com.project.schoolmanagment.service.user.UserService;
-import java.util.ArrayList;
-import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +32,7 @@ public class UserController {
       @PathVariable String userRole){
     return ResponseEntity.ok(userService.saveUser(userRequest,userRole));
   }
-  
+
   @GetMapping("/getAllUsersByPage/{userRole}")
   public ResponseEntity<Page<UserResponse>> getUserByPage(
       @PathVariable String userRole,
