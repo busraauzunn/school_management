@@ -30,7 +30,6 @@ public class UserController {
       @RequestBody @Valid UserRequest userRequest,
       @PathVariable String userRole){
     return ResponseEntity.ok(userService.saveUser(userRequest,userRole));
-
   }
 
 }
