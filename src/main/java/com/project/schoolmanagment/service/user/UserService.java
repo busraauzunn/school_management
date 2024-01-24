@@ -10,9 +10,12 @@ import com.project.schoolmanagment.payload.request.user.UserRequest;
 import com.project.schoolmanagment.payload.response.businnes.ResponseMessage;
 import com.project.schoolmanagment.payload.response.user.UserResponse;
 import com.project.schoolmanagment.repository.user.UserRepository;
+import com.project.schoolmanagment.service.helper.PageableHelper;
 import com.project.schoolmanagment.service.validator.UniquePropertyValidator;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,6 +26,7 @@ public class UserService {
   private final UniquePropertyValidator uniquePropertyValidator;
   private final UserMapper userMapper;
   private final UserRoleService userRoleService;
+  private final PageableHelper pageableHelper;
 
   public ResponseMessage<UserResponse> saveUser(UserRequest userRequest, String userRole) {
     //we need a validator for unique props.
@@ -57,5 +61,13 @@ public class UserService {
         .object(userMapper.mapUserToUserResponse(savedUser))
         .build();
  
+  }
+
+  public Page<UserResponse> getUsersByPage(int page, int size, String sort, String type,
+      String userRole) {
+    Pageable pageable = pageableHelper.getPageableWithProperties(page, size, sort, type);    
+    return userRepository.findByUserByRole(userRole,pageable)
+        //map entity to response DTO
+        .map(userMapper::mapUserToUserResponse);
   }
 }

@@ -22,7 +22,7 @@ public class UserRoleService {
         );
   }
   
-  private List<UserRole>getAllUserRole(){
+  public List<UserRole>getAllUserRole(){
     return userRoleRepository.findAll();
   }
   
