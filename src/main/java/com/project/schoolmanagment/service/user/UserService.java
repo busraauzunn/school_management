@@ -103,7 +103,7 @@ public class UserService {
   public String updateUser(UserRequestWithoutPassword userRequest,
       HttpServletRequest request) {
     
-    String userName = (String) request.getAttribute("username");    
+    String userName = (String) request.getHeader("username");    
     User user = userRepository.findByUsername(userName);    
     //we need to check if user is builtIn
     methodHelper.checkBuiltIn(user);
@@ -123,5 +123,16 @@ public class UserService {
     
     userRepository.save(user);
     return SuccessMessages.USER_UPDATE;
+  }
+
+  public ResponseMessage<BaseUserResponse> updateAdminDeanViceDeanByAdmin(Long userId,
+      UserRequest userRequest) {
+       
+    //check user if really exist
+    User user = methodHelper.isUserExist(userId);
+    //check user is built in
+    methodHelper.checkBuiltIn(user);
+    
+    
   }
 }

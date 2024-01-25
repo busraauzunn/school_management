@@ -68,6 +68,13 @@ public class UserController {
   }
   
   
+  public ResponseMessage<BaseUserResponse>updateAdminDeanViceDeanByAdmin(
+      @RequestBody @Valid UserRequest userRequest,
+      @PathVariable Long userId){
+    return userService.updateAdminDeanViceDeanByAdmin(userId,userRequest);
+  }
+  
+  
   
 
 }
