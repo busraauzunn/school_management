@@ -7,6 +7,7 @@ import com.project.schoolmanagment.payload.mappers.UserMapper;
 import com.project.schoolmanagment.payload.messages.ErrorMessages;
 import com.project.schoolmanagment.payload.messages.SuccessMessages;
 import com.project.schoolmanagment.payload.request.user.UserRequest;
+import com.project.schoolmanagment.payload.response.abstracts.BaseUserResponse;
 import com.project.schoolmanagment.payload.response.businnes.ResponseMessage;
 import com.project.schoolmanagment.payload.response.user.UserResponse;
 import com.project.schoolmanagment.repository.user.UserRepository;
@@ -16,6 +17,7 @@ import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -69,5 +71,18 @@ public class UserService {
     return userRepository.findByUserByRole(userRole,pageable)
         //map entity to response DTO
         .map(userMapper::mapUserToUserResponse);
+  }
+
+  public ResponseMessage<BaseUserResponse> getUserById(Long userId) {
+    //need to check if user exist with this id
+    User user = userRepository.findById(userId).orElseThrow(()->
+        new ResourceNotFoundException(String.format(ErrorMessages.NOT_FOUND_USER_MESSAGE,userId)));
+    
+    return ResponseMessage.<BaseUserResponse>builder()
+        .message(SuccessMessages.USER_FOUND)
+        .object(userMapper.mapUserToUserResponse(user))
+        .httpStatus(HttpStatus.OK)
+        .build();
+    
   }
 }

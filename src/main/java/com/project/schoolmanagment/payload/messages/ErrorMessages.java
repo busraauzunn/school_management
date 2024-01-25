@@ -5,6 +5,9 @@ public class ErrorMessages {
   private ErrorMessages() {
   }
 
+  //user
+  public static final String NOT_FOUND_USER_MESSAGE = "Error: User not found with id %s";
+  
   //user roles
   public static final String ROLE_NOT_FOUND = "There is no role like that, check the database";
   public static final String NOT_FOUND_USER_USER_ROLE_MESSAGE = "Error: User not found with user-role %s";

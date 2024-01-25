@@ -1,6 +1,7 @@
 package com.project.schoolmanagment.controller.user;
 
 import com.project.schoolmanagment.payload.request.user.UserRequest;
+import com.project.schoolmanagment.payload.response.abstracts.BaseUserResponse;
 import com.project.schoolmanagment.payload.response.businnes.ResponseMessage;
 import com.project.schoolmanagment.payload.response.user.UserResponse;
 import com.project.schoolmanagment.service.user.UserService;
@@ -43,6 +44,14 @@ public class UserController {
     Page<UserResponse>userResponse = userService.getUsersByPage(page,size,sort,type,userRole);
     return new ResponseEntity<>(userResponse, HttpStatus.OK);
   }
+  
+  @GetMapping("/getUserById/{userId}")
+  public ResponseMessage<BaseUserResponse>getUserById(@PathVariable Long userId){
+    return userService.getUserById(userId);
+  }
+  
+  
+  
   
 
 }
