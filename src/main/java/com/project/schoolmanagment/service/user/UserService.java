@@ -7,17 +7,22 @@ import com.project.schoolmanagment.payload.mappers.UserMapper;
 import com.project.schoolmanagment.payload.messages.ErrorMessages;
 import com.project.schoolmanagment.payload.messages.SuccessMessages;
 import com.project.schoolmanagment.payload.request.user.UserRequest;
+import com.project.schoolmanagment.payload.request.user.UserRequestWithoutPassword;
 import com.project.schoolmanagment.payload.response.abstracts.BaseUserResponse;
 import com.project.schoolmanagment.payload.response.businnes.ResponseMessage;
 import com.project.schoolmanagment.payload.response.user.UserResponse;
 import com.project.schoolmanagment.repository.user.UserRepository;
 import com.project.schoolmanagment.service.helper.PageableHelper;
 import com.project.schoolmanagment.service.validator.UniquePropertyValidator;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -83,6 +88,44 @@ public class UserService {
         .object(userMapper.mapUserToUserResponse(user))
         .httpStatus(HttpStatus.OK)
         .build();
+    
+  }
+
+  public List<UserResponse> getUserByName(String userName) {    
+    return userRepository.getUserByNameContaining(userName)
+        .stream()
+        .map(userMapper::mapUserToUserResponse)
+        .collect(Collectors.toList());   
+  }
+
+  public ResponseEntity<String> updateUser(UserRequestWithoutPassword userRequestWithoutPassword,
+      HttpServletRequest request) {
+    
+    String userName = (String) request.getAttribute("username");
+    
+    User user = userRepository.findByUsername(userName);
+    
+    //we need to check if user is builtIn
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
     
   }
 }
