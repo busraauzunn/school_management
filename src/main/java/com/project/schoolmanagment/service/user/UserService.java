@@ -12,6 +12,7 @@ import com.project.schoolmanagment.payload.response.abstracts.BaseUserResponse;
 import com.project.schoolmanagment.payload.response.businnes.ResponseMessage;
 import com.project.schoolmanagment.payload.response.user.UserResponse;
 import com.project.schoolmanagment.repository.user.UserRepository;
+import com.project.schoolmanagment.service.helper.MethodHelper;
 import com.project.schoolmanagment.service.helper.PageableHelper;
 import com.project.schoolmanagment.service.validator.UniquePropertyValidator;
 import java.util.List;
@@ -34,6 +35,7 @@ public class UserService {
   private final UserMapper userMapper;
   private final UserRoleService userRoleService;
   private final PageableHelper pageableHelper;
+  private final MethodHelper methodHelper;
 
   public ResponseMessage<UserResponse> saveUser(UserRequest userRequest, String userRole) {
     //we need a validator for unique props.
@@ -106,7 +108,9 @@ public class UserService {
     User user = userRepository.findByUsername(userName);
     
     //we need to check if user is builtIn
+    methodHelper.checkBuiltIn(user);
     
+    //uniqueness control
         
         
         
