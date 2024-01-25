@@ -100,36 +100,28 @@ public class UserService {
         .collect(Collectors.toList());   
   }
 
-  public ResponseEntity<String> updateUser(UserRequestWithoutPassword userRequestWithoutPassword,
+  public String updateUser(UserRequestWithoutPassword userRequest,
       HttpServletRequest request) {
     
-    String userName = (String) request.getAttribute("username");
-    
-    User user = userRepository.findByUsername(userName);
-    
+    String userName = (String) request.getAttribute("username");    
+    User user = userRepository.findByUsername(userName);    
     //we need to check if user is builtIn
     methodHelper.checkBuiltIn(user);
     
     //uniqueness control
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+    uniquePropertyValidator.checkUniqueProperties(user,userRequest);
+    //classic mappings instead of builder mappers
+    user.setName(userRequest.getName());
+    user.setSurname(userRequest.getSurname());
+    user.setUsername(userRequest.getUsername());
+    user.setBirthDay(userRequest.getBirthDay());
+    user.setBirthPlace(userRequest.getBirthPlace());
+    user.setEmail(userRequest.getEmail());
+    user.setPhoneNumber(userRequest.getPhoneNumber());
+    user.setGender(userRequest.getGender());
+    user.setSsn(userRequest.getSsn());
     
-    
+    userRepository.save(user);
+    return SuccessMessages.USER_UPDATE;
   }
 }

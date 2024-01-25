@@ -1,5 +1,6 @@
 package com.project.schoolmanagment.controller.user;
 
+import com.project.schoolmanagment.payload.messages.SuccessMessages;
 import com.project.schoolmanagment.payload.request.user.UserRequest;
 import com.project.schoolmanagment.payload.request.user.UserRequestWithoutPassword;
 import com.project.schoolmanagment.payload.response.abstracts.BaseUserResponse;
@@ -63,7 +64,7 @@ public class UserController {
   public ResponseEntity<String>updateUser(@RequestBody @Valid
       UserRequestWithoutPassword userRequestWithoutPassword,
       HttpServletRequest request) {
-    return userService.updateUser(userRequestWithoutPassword,request);
+    return ResponseEntity.ok(userService.updateUser(userRequestWithoutPassword,request));
   }
   
   
