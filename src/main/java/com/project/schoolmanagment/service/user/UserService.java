@@ -2,6 +2,7 @@ package com.project.schoolmanagment.service.user;
 
 import com.project.schoolmanagment.entity.concretes.user.User;
 import com.project.schoolmanagment.entity.enums.RoleType;
+import com.project.schoolmanagment.exception.BadRequestException;
 import com.project.schoolmanagment.exception.ResourceNotFoundException;
 import com.project.schoolmanagment.payload.mappers.UserMapper;
 import com.project.schoolmanagment.payload.messages.ErrorMessages;
@@ -23,13 +24,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
-  
+
   private final UserRepository userRepository;
   private final UniquePropertyValidator uniquePropertyValidator;
   private final UserMapper userMapper;
@@ -43,13 +43,13 @@ public class UserService {
         userRequest.getUsername(),
         userRequest.getSsn(),
         userRequest.getPhoneNumber(),
-        userRequest.getEmail());    
+        userRequest.getEmail());
     //we need to map DTO -> entity
     User user = userMapper.mapUserRequestToUser(userRequest);
     //analise the role and set it to the entity
-    if(userRole.equalsIgnoreCase(RoleType.ADMIN.getName())){
+    if (userRole.equalsIgnoreCase(RoleType.ADMIN.getName())) {
       //if username is Admin then we set this user buildIn -> TRUE
-      if(Objects.equals(userRequest.getUsername(),"Admin")){
+      if (Objects.equals(userRequest.getUsername(), "Admin")) {
         user.setBuiltIn(true);
       }
       //since role information is kept in another table, 
@@ -60,56 +60,57 @@ public class UserService {
     } else if (userRole.equalsIgnoreCase("ViceDean")) {
       user.setUserRole(userRoleService.getUserRole(RoleType.ASSISTANT_MANAGER));
     } else {
-      throw new ResourceNotFoundException(String.format(ErrorMessages.NOT_FOUND_USER_USER_ROLE_MESSAGE,userRole));
+      throw new ResourceNotFoundException(
+          String.format(ErrorMessages.NOT_FOUND_USER_USER_ROLE_MESSAGE, userRole));
     }
 
     User savedUser = userRepository.save(user);
-    
+
     return ResponseMessage.<UserResponse>builder()
         .message(SuccessMessages.USER_CREATE)
-        .object(userMapper.mapUserToUserResponse(savedUser))
+        .returnBody(userMapper.mapUserToUserResponse(savedUser))
         .build();
- 
+
   }
 
   public Page<UserResponse> getUsersByPage(int page, int size, String sort, String type,
       String userRole) {
-    Pageable pageable = pageableHelper.getPageableWithProperties(page, size, sort, type);    
-    return userRepository.findByUserByRole(userRole,pageable)
+    Pageable pageable = pageableHelper.getPageableWithProperties(page, size, sort, type);
+    return userRepository.findByUserByRole(userRole, pageable)
         //map entity to response DTO
         .map(userMapper::mapUserToUserResponse);
   }
 
   public ResponseMessage<BaseUserResponse> getUserById(Long userId) {
     //need to check if user exist with this id
-    User user = userRepository.findById(userId).orElseThrow(()->
-        new ResourceNotFoundException(String.format(ErrorMessages.NOT_FOUND_USER_MESSAGE,userId)));
-    
+    User user = userRepository.findById(userId).orElseThrow(() ->
+        new ResourceNotFoundException(String.format(ErrorMessages.NOT_FOUND_USER_MESSAGE, userId)));
+
     return ResponseMessage.<BaseUserResponse>builder()
         .message(SuccessMessages.USER_FOUND)
-        .object(userMapper.mapUserToUserResponse(user))
+        .returnBody(userMapper.mapUserToUserResponse(user))
         .httpStatus(HttpStatus.OK)
         .build();
-    
+
   }
 
-  public List<UserResponse> getUserByName(String userName) {    
+  public List<UserResponse> getUserByName(String userName) {
     return userRepository.getUserByNameContaining(userName)
         .stream()
         .map(userMapper::mapUserToUserResponse)
-        .collect(Collectors.toList());   
+        .collect(Collectors.toList());
   }
 
   public String updateUser(UserRequestWithoutPassword userRequest,
       HttpServletRequest request) {
-    
-    String userName = (String) request.getHeader("username");    
-    User user = userRepository.findByUsername(userName);    
+
+    String userName = (String) request.getHeader("username");
+    User user = userRepository.findByUsername(userName);
     //we need to check if user is builtIn
     methodHelper.checkBuiltIn(user);
-    
+
     //uniqueness control
-    uniquePropertyValidator.checkUniqueProperties(user,userRequest);
+    uniquePropertyValidator.checkUniqueProperties(user, userRequest);
     //classic mappings instead of builder mappers
     user.setName(userRequest.getName());
     user.setSurname(userRequest.getSurname());
@@ -120,19 +121,64 @@ public class UserService {
     user.setPhoneNumber(userRequest.getPhoneNumber());
     user.setGender(userRequest.getGender());
     user.setSsn(userRequest.getSsn());
-    
+
     userRepository.save(user);
     return SuccessMessages.USER_UPDATE;
   }
 
   public ResponseMessage<BaseUserResponse> updateAdminDeanViceDeanByAdmin(Long userId,
       UserRequest userRequest) {
-       
+
     //check user if really exist
+    //entity-1 comes from DB
     User user = methodHelper.isUserExist(userId);
     //check user is built in
     methodHelper.checkBuiltIn(user);
-    
-    
+
+    uniquePropertyValidator.checkUniqueProperties(user, userRequest);
+    //entity-2 created by mappers from DTO
+    User userToSave = userMapper.mapUserRequestToUser(userRequest);
+    userToSave.setId(user.getId());
+    userToSave.setUserRole(user.getUserRole());
+    //entity-3 return type of save operation
+    User savedUser = userRepository.save(userToSave);
+    //time to return BaseUserResponse DTO to controller
+    return ResponseMessage.<BaseUserResponse>builder()
+        .message(SuccessMessages.USER_UPDATE_MESSAGE)
+        .httpStatus(HttpStatus.OK)
+        .returnBody(userMapper.mapUserToUserResponse(savedUser))
+        .build();
   }
+
+  public String deleteUserById(Long id, HttpServletRequest httpServletRequest) {
+    User user = methodHelper.isUserExist(id);
+
+    //username of logged in person
+    String userName = httpServletRequest.getHeader("username");
+
+    User loggedInUser = userRepository.findByUsername(userName);
+
+    RoleType loggedInUserRole = loggedInUser.getUserRole().getRoleType();
+    RoleType deletedUserRole = user.getUserRole().getRoleType();
+    if (loggedInUser.getBuiltIn()) {
+      //buildIn users can not neither be updated nor deleted.
+      throw new BadRequestException(ErrorMessages.NOT_PERMITTED_METHOD_MESSAGE);
+      //manager can only delete teacher/student/viceDean
+    } else if (loggedInUserRole == RoleType.MANAGER) {
+      if (!(deletedUserRole == RoleType.TEACHER ||
+          deletedUserRole == RoleType.STUDENT ||
+          deletedUserRole == RoleType.ASSISTANT_MANAGER)) {
+        throw new BadRequestException(ErrorMessages.NOT_PERMITTED_METHOD_MESSAGE);
+      }
+      //assistan manager can only delete teacher/student
+    } else if (loggedInUserRole == RoleType.ASSISTANT_MANAGER) {
+      if (!(deletedUserRole == RoleType.TEACHER ||
+          deletedUserRole == RoleType.STUDENT)) {
+        throw new BadRequestException(ErrorMessages.NOT_PERMITTED_METHOD_MESSAGE);
+      }
+    }
+    userRepository.deleteById(id);
+    return SuccessMessages.USER_DELETE;
+  }
+
 }

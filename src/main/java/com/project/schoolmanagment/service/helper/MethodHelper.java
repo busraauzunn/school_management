@@ -12,8 +12,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class MethodHelper {
   
-  public final UserRepository userRepository;
-  
+  public final UserRepository userRepository;  
   
   public User isUserExist(Long userId){
     return userRepository.findById(userId)
