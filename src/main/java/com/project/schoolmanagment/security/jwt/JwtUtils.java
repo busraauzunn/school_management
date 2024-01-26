@@ -14,6 +14,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+/**
+ * The JwtUtils class provides utility methods for JSON Web Token (JWT) generation, validation, and retrieval of information.
+ */
 @Component
 public class JwtUtils {
   
@@ -25,11 +28,23 @@ public class JwtUtils {
   @Value("${backendapi.app.jwtSecret}")
   private String jwtSecret;
   
+  /**
+   * Generates a JSON Web Token (JWT) based on the provided authentication.
+   *
+   * @param authentication the authentication object representing the current user
+   * @return the generated JWT token
+   */
   public String generateJwtToken(Authentication authentication){
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
     return buildTokenFromUsername(userDetails.getUsername());
   }  
   
+  /**
+   * Builds a JSON Web Token (JWT) using the provided username.
+   *
+   * @param username the username used as the subject of the JWT
+   * @return the generated JWT token
+   */
   private String buildTokenFromUsername(String username){
     return Jwts.builder()
         .setSubject(username)
@@ -41,6 +56,12 @@ public class JwtUtils {
   
   
   
+  /**
+   * Validates a JSON Web Token (JWT).
+   *
+   * @param jwtToken the JWT token to be validated
+   * @return true if the JWT token is valid, false otherwise
+   */
   public boolean validateJwtToken(String jwtToken){
     try {
       Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwtToken);
@@ -62,6 +83,12 @@ public class JwtUtils {
   
   
   
+  /**
+   * Retrieves the username from a JSON Web Token (JWT).
+   *
+   * @param token the JWT token from which to retrieve the username
+   * @return the username extracted from the JWT token
+   */
   public String getUsernameFromJwtToken(String token){
     return Jwts.parser()
         .setSigningKey(jwtSecret)

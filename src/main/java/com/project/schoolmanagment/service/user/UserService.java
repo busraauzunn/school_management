@@ -37,6 +37,14 @@ public class UserService {
   private final PageableHelper pageableHelper;
   private final MethodHelper methodHelper;
 
+  /**
+   * Saves a user with the specified user request and user role.
+   *
+   * @param userRequest The UserRequest object containing the user information.
+   * @param userRole    The role of the user.
+   * @return A ResponseMessage object containing the status, message, and the saved user information.
+   * @throws ResourceNotFoundException If the specified user role does not exist.
+   */
   public ResponseMessage<UserResponse> saveUser(UserRequest userRequest, String userRole) {
     //we need a validator for unique props.
     uniquePropertyValidator.checkDuplicate(
@@ -73,6 +81,16 @@ public class UserService {
 
   }
 
+  /**
+   * Retrieves a page of users based on the specified page number, size, sort, type, and user role.
+   *
+   * @param page      The page number to retrieve. Must be greater than or equal to 0.
+   * @param size      The number of items per page. Must be greater than 0.
+   * @param sort      The name of the field to sort the results by.
+   * @param type      The type of sorting. "asc" for ascending, "desc" for descending.
+   * @param userRole  The role of the user.
+   * @return A page of UserResponse objects containing the user information.
+   */
   public Page<UserResponse> getUsersByPage(int page, int size, String sort, String type,
       String userRole) {
     Pageable pageable = pageableHelper.getPageableWithProperties(page, size, sort, type);
@@ -81,6 +99,13 @@ public class UserService {
         .map(userMapper::mapUserToUserResponse);
   }
 
+  /**
+   * Retrieves a user by their ID.
+   *
+   * @param userId The ID of the user to retrieve.
+   * @return A ResponseMessage object containing the user information.
+   * @throws ResourceNotFoundException If the user with the given ID does not exist.
+   */
   public ResponseMessage<BaseUserResponse> getUserById(Long userId) {
     //need to check if user exist with this id
     User user = userRepository.findById(userId).orElseThrow(() ->
@@ -94,6 +119,12 @@ public class UserService {
 
   }
 
+  /**
+   * Retrieves a list of users by their username.
+   *
+   * @param userName The username of the user to search for.
+   * @return A list of UserResponse objects containing the user information.
+   */
   public List<UserResponse> getUserByName(String userName) {
     return userRepository.getUserByNameContaining(userName)
         .stream()
@@ -101,6 +132,13 @@ public class UserService {
         .collect(Collectors.toList());
   }
 
+  /**
+   * Updates the user information.
+   *
+   * @param userRequest The UserRequestWithoutPassword object containing the updated user information.
+   * @param request The HttpServletRequest object.
+   * @return The success message indicating that the user has been updated.
+   */
   public String updateUser(UserRequestWithoutPassword userRequest,
       HttpServletRequest request) {
 
@@ -126,6 +164,13 @@ public class UserService {
     return SuccessMessages.USER_UPDATE;
   }
 
+  /**
+   * Updates the admin, dean, or vice dean user by an admin.
+   *
+   * @param userId       The ID of the user to be updated.
+   * @param userRequest  The UserRequest object containing the updated user information.
+   * @return A ResponseMessage object with the updated user information.
+   */
   public ResponseMessage<BaseUserResponse> updateAdminDeanViceDeanByAdmin(Long userId,
       UserRequest userRequest) {
 
@@ -150,6 +195,15 @@ public class UserService {
         .build();
   }
 
+  /**
+   * Deletes a user by their ID.
+   *
+   * @param id                The ID of the user to be deleted.
+   * @param httpServletRequest The HttpServletRequest object.
+   * @return A success message indicating that the user has been deleted.
+   * @throws BadRequestException         If the logged-in user does not have the permission to delete the user.
+   * @throws ResourceNotFoundException  If the user to be deleted does not exist.
+   */
   public String deleteUserById(Long id, HttpServletRequest httpServletRequest) {
     User user = methodHelper.isUserExist(id);
 
