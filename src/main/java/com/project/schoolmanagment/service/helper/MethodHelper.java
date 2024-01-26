@@ -6,6 +6,7 @@ import com.project.schoolmanagment.exception.ResourceNotFoundException;
 import com.project.schoolmanagment.payload.messages.ErrorMessages;
 import com.project.schoolmanagment.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -25,6 +26,14 @@ public class MethodHelper {
     if(user.getBuiltIn()){
       throw new BadRequestException(ErrorMessages.NOT_PERMITTED_METHOD_MESSAGE);
     }
+  }
+  
+  public User loadUserByName(String username){
+    User user = userRepository.findByUsername(username);
+    if(user==null){
+      throw new UsernameNotFoundException(String.format(ErrorMessages.NOT_FOUND_USER_MESSAGE_USERNAME, username));
+    }
+    return user;
   }
 
 }
