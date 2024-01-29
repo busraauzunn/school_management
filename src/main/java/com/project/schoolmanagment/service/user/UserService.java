@@ -142,7 +142,7 @@ public class UserService {
   public String updateUser(UserRequestWithoutPassword userRequest,
       HttpServletRequest request) {
 
-    String userName = (String) request.getHeader("username");
+    String userName = (String) request.getAttribute("username");
     User user = userRepository.findByUsername(userName);
     //we need to check if user is builtIn
     methodHelper.checkBuiltIn(user);
@@ -208,7 +208,7 @@ public class UserService {
     User user = methodHelper.isUserExist(id);
 
     //username of logged in person
-    String userName = httpServletRequest.getHeader("username");
+    String userName = (String) httpServletRequest.getAttribute("username");
 
     User loggedInUser = userRepository.findByUsername(userName);
 
