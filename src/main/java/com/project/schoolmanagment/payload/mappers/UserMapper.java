@@ -3,17 +3,22 @@ package com.project.schoolmanagment.payload.mappers;
 import com.project.schoolmanagment.entity.concretes.user.User;
 import com.project.schoolmanagment.payload.request.abstracts.BaseUserRequest;
 import com.project.schoolmanagment.payload.response.user.UserResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class UserMapper {
+  
+  private final PasswordEncoder passwordEncoder;
   
   public User mapUserRequestToUser(BaseUserRequest userRequest){
     return User.builder()
         .username(userRequest.getUsername())
         .name(userRequest.getName())
         .surname(userRequest.getSurname())
-        .password(userRequest.getPassword())
+        .password(passwordEncoder.encode(userRequest.getPassword()))
         .ssn(userRequest.getSsn())
         .birthDay(userRequest.getBirthDay())
         .birthPlace(userRequest.getBirthPlace())

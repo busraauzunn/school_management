@@ -234,5 +234,9 @@ public class UserService {
     userRepository.deleteById(id);
     return SuccessMessages.USER_DELETE;
   }
+  
+  public List<User> getAllUsers(){
+    return userRepository.findAll();
+  }
 
 }

@@ -32,14 +32,22 @@ public class WebSecurityConfig {
   
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    //CORS (Cross-Origin Resource Sharing) and CSRF (Cross-Site Request Forgery) is disabled
     http.cors().and()
         .csrf().disable()
+        //configure the exception handler
         .exceptionHandling().authenticationEntryPoint(authEntryPointJwt).and()
+        //configure the session management
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+        //configure white list 
         .authorizeRequests().antMatchers(AUTH_WHITE_LIST).permitAll()
+        //configure authentication all rest of the URL.s
         .anyRequest().authenticated();
+    //configure the frames to be sure from the same origin
     http.headers().frameOptions().sameOrigin();
+    //configure the authentication provider
     http.authenticationProvider(daoAuthenticationProvider());
+    //configure JWT token handling
     http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     return http.build();    
   }
