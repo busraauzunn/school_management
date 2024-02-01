@@ -41,7 +41,7 @@ public class AuthenticationService {
     SecurityContextHolder.getContext().setAuthentication(authentication);
     
     //create new JWT for user
-    String token = "Bearer " + jwtUtils.generateJwtToken(authentication);
+    String token = jwtUtils.generateJwtToken(authentication);
 
     //get all info for user
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
