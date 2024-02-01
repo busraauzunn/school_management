@@ -9,6 +9,7 @@ public class ErrorMessages {
   public static final String NOT_FOUND_USER_MESSAGE = "Error: User not found with id %s";
   public static final String NOT_FOUND_USER_MESSAGE_USERNAME = "Error: User not found with username %s";
   public static final String NOT_PERMITTED_METHOD_MESSAGE = "You do not have any permission to do this operation";
+  public static final String PASSWORD_SHOULD_NOT_MATCHED = "Your passwords are not matched" ;
   
   //user roles
   public static final String ROLE_NOT_FOUND = "There is no role like that, check the database";

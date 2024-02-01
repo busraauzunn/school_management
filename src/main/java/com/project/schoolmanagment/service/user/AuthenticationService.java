@@ -1,13 +1,18 @@
 package com.project.schoolmanagment.service.user;
 
+import com.project.schoolmanagment.entity.concretes.user.User;
+import com.project.schoolmanagment.exception.BadRequestException;
 import com.project.schoolmanagment.payload.mappers.UserMapper;
+import com.project.schoolmanagment.payload.messages.ErrorMessages;
 import com.project.schoolmanagment.payload.request.authentication.LoginRequest;
+import com.project.schoolmanagment.payload.request.authentication.UpdatePasswordRequest;
 import com.project.schoolmanagment.payload.response.authentication.AuthResponse;
 import com.project.schoolmanagment.repository.user.UserRepository;
 import com.project.schoolmanagment.security.jwt.JwtUtils;
 import com.project.schoolmanagment.security.service.UserDetailsImpl;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -64,6 +69,26 @@ public class AuthenticationService {
     responseBuilder.role(userRole);
     
     return responseBuilder.build();    
+    
+  }
+
+  public void updatePassword(UpdatePasswordRequest updatePasswordRequest,
+      HttpServletRequest httpServletRequest) {
+    String username = (String) httpServletRequest.getAttribute("username");
+    User user = userRepository.findByUsername(username);
+    
+    //validate if user is not builtIn
+    if(user.getBuiltIn()){
+      throw new BadRequestException(ErrorMessages.NOT_PERMITTED_METHOD_MESSAGE);
+    }
+    
+    //validate if old and new passwords does not match
+    if(passwordEncoder.matches(updatePasswordRequest.getNewPassword(),user.getPassword())){
+      throw new BadRequestException(ErrorMessages.PASSWORD_SHOULD_NOT_MATCHED);
+    }
+    
+    user.setPassword(passwordEncoder.encode(updatePasswordRequest.getNewPassword()));
+    userRepository.save(user);
     
   }
 }
