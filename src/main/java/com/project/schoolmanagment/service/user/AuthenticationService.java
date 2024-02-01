@@ -7,6 +7,7 @@ import com.project.schoolmanagment.payload.messages.ErrorMessages;
 import com.project.schoolmanagment.payload.request.authentication.LoginRequest;
 import com.project.schoolmanagment.payload.request.authentication.UpdatePasswordRequest;
 import com.project.schoolmanagment.payload.response.authentication.AuthResponse;
+import com.project.schoolmanagment.payload.response.user.UserResponse;
 import com.project.schoolmanagment.repository.user.UserRepository;
 import com.project.schoolmanagment.security.jwt.JwtUtils;
 import com.project.schoolmanagment.security.service.UserDetailsImpl;
@@ -90,5 +91,11 @@ public class AuthenticationService {
     user.setPassword(passwordEncoder.encode(updatePasswordRequest.getNewPassword()));
     userRepository.save(user);
     
+  }
+
+  public UserResponse findByUsername(HttpServletRequest httpServletRequest) {    
+    String userName = (String) httpServletRequest.getAttribute("username");
+    User user = userRepository.findByUsername(userName);
+    return userMapper.mapUserToUserResponse(user);
   }
 }

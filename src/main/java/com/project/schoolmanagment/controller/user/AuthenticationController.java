@@ -4,6 +4,7 @@ import com.project.schoolmanagment.payload.messages.SuccessMessages;
 import com.project.schoolmanagment.payload.request.authentication.LoginRequest;
 import com.project.schoolmanagment.payload.request.authentication.UpdatePasswordRequest;
 import com.project.schoolmanagment.payload.response.authentication.AuthResponse;
+import com.project.schoolmanagment.payload.response.user.UserResponse;
 import com.project.schoolmanagment.service.user.AuthenticationService;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,5 +39,12 @@ public class AuthenticationController {
     authenticationService.updatePassword(updatePasswordRequest,httpServletRequest);
     return ResponseEntity.ok(SuccessMessages.PASSWORD_CHANGED_RESPONSE_MESSAGE);
   }
+
+  @PreAuthorize("hasAnyAuthority('Admin','Dean','ViceDean','Teacher','Student')")
+  @GetMapping("/user")
+  public ResponseEntity<UserResponse>findByUsername(HttpServletRequest httpServletRequest){
+    return ResponseEntity.ok(authenticationService.findByUsername(httpServletRequest));
+  }
+  
 
 }
