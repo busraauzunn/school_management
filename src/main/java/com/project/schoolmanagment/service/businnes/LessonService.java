@@ -9,7 +9,12 @@ import com.project.schoolmanagment.payload.request.businnes.LessonRequest;
 import com.project.schoolmanagment.payload.response.businnes.LessonResponse;
 import com.project.schoolmanagment.payload.response.businnes.ResponseMessage;
 import com.project.schoolmanagment.repository.businnes.LessonRepository;
+import com.project.schoolmanagment.service.helper.PageableHelper;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +24,7 @@ public class LessonService {
   
   private final LessonRepository lessonRepository;
   public final LessonMapper lessonMapper;
+  public final PageableHelper pageableHelper;
 
   public ResponseMessage<LessonResponse> saveLesson(LessonRequest lessonRequest) {
     //lessons must be unique
@@ -45,6 +51,7 @@ public class LessonService {
         new ResourceNotFoundException(String.format(ErrorMessages.NOT_FOUND_LESSON_MESSAGE,id)));
   }
 
+
   public ResponseMessage deleteById(Long id) {
     isLessonExistById(id);
     lessonRepository.deleteById(id);
@@ -66,5 +73,38 @@ public class LessonService {
           .httpStatus(HttpStatus.NOT_FOUND)
           .build();
     }
+  }
+
+  public Page<LessonResponse> findLessonByPage(int page, int size, String sort, String type) {
+    Pageable pageable = pageableHelper.getPageableWithProperties(page, size, sort, type);
+    return lessonRepository
+        .findAll(pageable)
+        .map(lessonMapper::mapLessonToLessonResponse);     
+  }
+
+  public Set<Lesson> getLessonByIdSet(Set<Long> idSet) {
+    return idSet.stream()
+        .map(this::isLessonExistById)
+        .collect(Collectors.toSet());    
+  }
+
+  public LessonResponse updateLessonById(Long lessonId, LessonRequest lessonRequest) {
+    //validate if lesson exist
+    Lesson lessonFromDatabase = isLessonExistById(lessonId);
+    
+    //lesson names must be unique
+    if(!lessonFromDatabase.getLessonName().equals(lessonRequest.getLessonName())){
+      //you are changing the lesson name, so it must be validated
+      isLessonExistByLessonName(lessonRequest.getLessonName());
+    }
+    
+    Lesson updatedLesson = lessonMapper.mapLessonRequestToLesson(lessonRequest);
+    updatedLesson.setId(lessonId);
+    //lesson programs property does not exist in mapper
+    // so we set it here    
+    updatedLesson.setLessonPrograms(lessonFromDatabase.getLessonPrograms());
+    Lesson savedLessonProgram = lessonRepository.save(updatedLesson);
+    //map entity to DTO for controller
+    return lessonMapper.mapLessonToLessonResponse(savedLessonProgram);
   }
 }
