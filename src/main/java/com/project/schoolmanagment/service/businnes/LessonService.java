@@ -103,8 +103,8 @@ public class LessonService {
     //lesson programs property does not exist in mapper
     // so we set it here    
     updatedLesson.setLessonPrograms(lessonFromDatabase.getLessonPrograms());
-    Lesson savedLessonProgram = lessonRepository.save(updatedLesson);
+    Lesson savedLesson = lessonRepository.save(updatedLesson);
     //map entity to DTO for controller
-    return lessonMapper.mapLessonToLessonResponse(savedLessonProgram);
+    return lessonMapper.mapLessonToLessonResponse(savedLesson);
   }
 }
