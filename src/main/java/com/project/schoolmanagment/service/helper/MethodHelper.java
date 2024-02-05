@@ -59,5 +59,11 @@ public class MethodHelper {
     }
     return user;
   }
+  
+  public void checkIsAdvisor(User user){
+    if(!user.getIsAdvisor()){
+      throw new ResourceNotFoundException(String.format(ErrorMessages.))
+    }
+  }
 
 }
