@@ -67,7 +67,7 @@ public class LessonController {
   @PreAuthorize("hasAnyAuthority('Admin','Dean','ViceDean')")
   @PutMapping("/update/{lessonId}")
   public ResponseEntity<LessonResponse>updateLessonById(@PathVariable Long lessonId,
-      @RequestBody LessonRequest lessonRequest){
+      @RequestBody @Valid LessonRequest lessonRequest){
     return ResponseEntity.ok(lessonService.updateLessonById(lessonId,lessonRequest));
   }
   
