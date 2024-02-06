@@ -81,10 +81,17 @@ public class StudentService {
     
     Set<LessonProgram>existingLessonPrograms = loggedInStudent.getLessonProgramList();
     
-    dateTimeValidator.che
+    dateTimeValidator.checkLessonPrograms(existingLessonPrograms,lessonProgramSet);
     
+    existingLessonPrograms.addAll(lessonProgramSet);
+    loggedInStudent.setLessonProgramList(existingLessonPrograms);
     
+    User savedStudent = userRepository.save(loggedInStudent);
     
-    
+    return ResponseMessage.<StudentResponse>builder()
+        .message(SuccessMessages.LESSON_PROGRAM_ADD_TO_STUDENT)
+        .returnBody(userMapper.mapUserToStudentResponse(savedStudent))
+        .httpStatus(HttpStatus.OK)
+        .build();
   }
 }
