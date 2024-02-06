@@ -7,6 +7,8 @@ import com.project.schoolmanagment.payload.response.businnes.LessonResponse;
 import com.project.schoolmanagment.payload.response.businnes.ResponseMessage;
 import com.project.schoolmanagment.service.businnes.LessonProgramService;
 import java.util.List;
+import java.util.Set;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
@@ -75,6 +77,18 @@ public class LessonProgramController {
       @RequestParam(value = "sort",defaultValue = "day") String sort,
       @RequestParam(value = "type",defaultValue = "desc") String type){
     return lessonProgramService.findLessonProgramByPage(page,size,sort,type);
+  }
+
+  @PreAuthorize("hasAnyAuthority('Teacher')")
+  @GetMapping("/getAllLessonProgramByTeacher")
+  public Set<LessonProgramResponse>getAllLessonProgramByTeacherUsername(HttpServletRequest httpServletRequest){
+    return lessonProgramService.getAllLessonProgramByTeacherUsername(httpServletRequest);
+  }
+
+  @PreAuthorize("hasAnyAuthority('Admin','Dean','ViceDean')")
+  @GetMapping("/getAllLessonProgramByTeacherId/{teacherId}")
+  public Set<LessonProgramResponse>getAllByTeacherId(@PathVariable Long teacherId){
+    return lessonProgramService.getAllByTeacherId(teacherId);
   }
   
   

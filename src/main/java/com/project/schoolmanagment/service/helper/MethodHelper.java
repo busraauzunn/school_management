@@ -1,7 +1,9 @@
 package com.project.schoolmanagment.service.helper;
 
 import com.project.schoolmanagment.entity.concretes.user.User;
+import com.project.schoolmanagment.entity.enums.RoleType;
 import com.project.schoolmanagment.exception.BadRequestException;
+import com.project.schoolmanagment.exception.ConflictException;
 import com.project.schoolmanagment.exception.ResourceNotFoundException;
 import com.project.schoolmanagment.payload.messages.ErrorMessages;
 import com.project.schoolmanagment.repository.user.UserRepository;
@@ -62,7 +64,13 @@ public class MethodHelper {
   
   public void checkIsAdvisor(User user){
     if(!user.getIsAdvisor()){
-      throw new ResourceNotFoundException(String.format(ErrorMessages.))
+      throw new ResourceNotFoundException(String.format(ErrorMessages.NOT_FOUND_ADVISOR_MESSAGE,user.getId()));
+    }
+  }
+  
+  public void checkRole(User user, RoleType roleType){
+    if(!user.getUserRole().getRoleType().equals(roleType)){
+      throw new ConflictException(ErrorMessages.NOT_HAVE_EXPECTED_ROLE_USER);
     }
   }
 

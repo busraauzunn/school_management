@@ -3,6 +3,8 @@ package com.project.schoolmanagment.service.businnes;
 import com.project.schoolmanagment.entity.concretes.businnes.EducationTerm;
 import com.project.schoolmanagment.entity.concretes.businnes.Lesson;
 import com.project.schoolmanagment.entity.concretes.businnes.LessonProgram;
+import com.project.schoolmanagment.entity.concretes.user.User;
+import com.project.schoolmanagment.entity.enums.RoleType;
 import com.project.schoolmanagment.exception.BadRequestException;
 import com.project.schoolmanagment.exception.ResourceNotFoundException;
 import com.project.schoolmanagment.payload.mappers.LessonProgramMapper;
@@ -12,11 +14,13 @@ import com.project.schoolmanagment.payload.request.businnes.LessonProgramRequest
 import com.project.schoolmanagment.payload.response.businnes.LessonProgramResponse;
 import com.project.schoolmanagment.payload.response.businnes.ResponseMessage;
 import com.project.schoolmanagment.repository.businnes.LessonProgramRepository;
+import com.project.schoolmanagment.service.helper.MethodHelper;
 import com.project.schoolmanagment.service.helper.PageableHelper;
 import com.project.schoolmanagment.service.validator.DateTimeValidator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +37,7 @@ public class LessonProgramService {
   private final DateTimeValidator dateTimeValidator;
   private final LessonProgramMapper lessonProgramMapper;
   private final PageableHelper pageableHelper;
+  private final MethodHelper methodHelper;
 
   public ResponseMessage<LessonProgramResponse> saveLessonProgram(
       LessonProgramRequest lessonProgramRequest) {
@@ -113,5 +118,26 @@ public class LessonProgramService {
       throw new BadRequestException(ErrorMessages.NOT_FOUND_LESSON_PROGRAM_MESSAGE_WITHOUT_ID_INFO);
     }
     return lessonProgramSet;
+  }
+
+  public Set<LessonProgramResponse> getAllLessonProgramByTeacherUsername(
+      HttpServletRequest httpServletRequest) {
+    String username = (String) httpServletRequest.getAttribute("username");
+    return lessonProgramRepository.getLessonProgramByUsername(username)
+        .stream()
+        .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
+        .collect(Collectors.toSet());    
+  }
+
+  public Set<LessonProgramResponse> getAllByTeacherId(Long teacherId) {
+    //check if user exist
+    User teacher = methodHelper.isUserExist(teacherId);
+    //check if this ID is a teacher
+    methodHelper.checkRole(teacher, RoleType.TEACHER);
+    
+    return lessonProgramRepository.findByUsers_IdEquals(teacherId)
+        .stream()
+        .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
+        .collect(Collectors.toSet());
   }
 }

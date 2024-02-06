@@ -3,6 +3,7 @@ package com.project.schoolmanagment.controller.user;
 import com.project.schoolmanagment.payload.request.user.TeacherRequest;
 import com.project.schoolmanagment.payload.response.businnes.ResponseMessage;
 import com.project.schoolmanagment.payload.response.user.TeacherResponse;
+import com.project.schoolmanagment.payload.response.user.UserResponse;
 import com.project.schoolmanagment.service.user.TeacherService;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +22,9 @@ public class TeacherController {
   private final TeacherService teacherService;
 
 
-  @PreAuthorize("hasAnyAuthority('Dean')")
+  @PreAuthorize("hasAnyAuthority('Admin')")
   @PostMapping("/save")
-  public ResponseEntity<ResponseMessage<TeacherResponse>> saveTeacher(
+  public ResponseEntity<ResponseMessage<UserResponse>> saveTeacher(
       @RequestBody @Valid TeacherRequest teacherRequest){
     return ResponseEntity.ok(teacherService.saveTeacher(teacherRequest));
   }
