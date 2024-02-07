@@ -120,7 +120,7 @@ public class LessonProgramService {
     return lessonProgramSet;
   }
 
-  public Set<LessonProgramResponse> getAllLessonProgramByTeacherUsername(
+  public Set<LessonProgramResponse> getAllLessonProgramByUsername(
       HttpServletRequest httpServletRequest) {
     String username = (String) httpServletRequest.getAttribute("username");
     return lessonProgramRepository.getLessonProgramByUsername(username)
@@ -136,6 +136,17 @@ public class LessonProgramService {
     methodHelper.checkRole(teacher, RoleType.TEACHER);
     
     return lessonProgramRepository.findByUsers_IdEquals(teacherId)
+        .stream()
+        .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
+        .collect(Collectors.toSet());
+  }
+
+  public Set<LessonProgramResponse> getAllByStudentId(Long studentId) {
+    //check if user exist
+    User student = methodHelper.isUserExist(studentId);
+    //check if this ID is a teacher
+    methodHelper.checkRole(student, RoleType.STUDENT);
+    return lessonProgramRepository.findByUsers_IdEquals(studentId)
         .stream()
         .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
         .collect(Collectors.toSet());

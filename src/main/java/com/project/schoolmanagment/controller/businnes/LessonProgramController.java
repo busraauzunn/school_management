@@ -1,9 +1,7 @@
 package com.project.schoolmanagment.controller.businnes;
 
 import com.project.schoolmanagment.payload.request.businnes.LessonProgramRequest;
-import com.project.schoolmanagment.payload.request.businnes.LessonRequest;
 import com.project.schoolmanagment.payload.response.businnes.LessonProgramResponse;
-import com.project.schoolmanagment.payload.response.businnes.LessonResponse;
 import com.project.schoolmanagment.payload.response.businnes.ResponseMessage;
 import com.project.schoolmanagment.service.businnes.LessonProgramService;
 import java.util.List;
@@ -11,14 +9,12 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -82,7 +78,13 @@ public class LessonProgramController {
   @PreAuthorize("hasAnyAuthority('Teacher')")
   @GetMapping("/getAllLessonProgramByTeacher")
   public Set<LessonProgramResponse>getAllLessonProgramByTeacherUsername(HttpServletRequest httpServletRequest){
-    return lessonProgramService.getAllLessonProgramByTeacherUsername(httpServletRequest);
+    return lessonProgramService.getAllLessonProgramByUsername(httpServletRequest);
+  }
+
+  @PreAuthorize("hasAnyAuthority('Student')")
+  @GetMapping("/getAllLessonProgramByStudent")
+  public Set<LessonProgramResponse>getAllLessonProgramByStudent(HttpServletRequest httpServletRequest){
+    return lessonProgramService.getAllLessonProgramByUsername(httpServletRequest);
   }
 
   @PreAuthorize("hasAnyAuthority('Admin','Dean','ViceDean')")
@@ -90,6 +92,14 @@ public class LessonProgramController {
   public Set<LessonProgramResponse>getAllByTeacherId(@PathVariable Long teacherId){
     return lessonProgramService.getAllByTeacherId(teacherId);
   }
+
+  @PreAuthorize("hasAnyAuthority('Admin','Dean','ViceDean')")
+  @GetMapping("/getAllLessonProgramByStudentId/{student}")
+  public Set<LessonProgramResponse>getAllByStudentId(@PathVariable Long student){
+    return lessonProgramService.getAllByStudentId(student);
+  }
+  
+  
   
   
 
