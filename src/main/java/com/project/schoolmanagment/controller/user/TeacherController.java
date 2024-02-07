@@ -1,11 +1,15 @@
 package com.project.schoolmanagment.controller.user;
 
+import com.project.schoolmanagment.payload.request.businnes.AddLessonProgramToTeacherRequest;
+import com.project.schoolmanagment.payload.request.businnes.ChooseLessonProgramRequest;
 import com.project.schoolmanagment.payload.request.user.TeacherRequest;
 import com.project.schoolmanagment.payload.response.businnes.ResponseMessage;
+import com.project.schoolmanagment.payload.response.user.StudentResponse;
 import com.project.schoolmanagment.payload.response.user.TeacherResponse;
 import com.project.schoolmanagment.payload.response.user.UserResponse;
 import com.project.schoolmanagment.service.user.TeacherService;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +45,21 @@ public class TeacherController {
       @PathVariable Long userId){
     return teacherService.updateTeacherByManagers(teacherRequest,userId);
   }
+  
+  @PreAuthorize("hasAnyAuthority('Teacher')")
+  @GetMapping("/getAllStudentByAdvisorUsername")
+  public List<StudentResponse>getAllStudentByAdvisorTeacher(HttpServletRequest httpServletRequest){
+    return teacherService.getAllStudentByAdvisorTeacher(httpServletRequest);
+  }
+
+
+  @PreAuthorize("hasAnyAuthority('Admin','Dean','ViceDean')")
+  @PostMapping("/addLessonProgram")
+  public ResponseMessage<UserResponse>chooseLesson(@RequestBody @Valid
+  AddLessonProgramToTeacherRequest addLessonProgramToTeacherRequest){
+    return teacherService.addLessonProgramToTeacher(addLessonProgramToTeacherRequest);
+  }
+  
 
 
   @PreAuthorize("hasAnyAuthority('Admin','Dean','ViceDean')")
