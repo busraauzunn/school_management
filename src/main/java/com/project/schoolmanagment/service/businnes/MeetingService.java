@@ -2,27 +2,22 @@ package com.project.schoolmanagment.service.businnes;
 
 import com.project.schoolmanagment.entity.concretes.businnes.Meet;
 import com.project.schoolmanagment.entity.concretes.user.User;
-import com.project.schoolmanagment.entity.enums.RoleType;
-import com.project.schoolmanagment.exception.BadRequestException;
-import com.project.schoolmanagment.exception.ConflictException;
-import com.project.schoolmanagment.exception.ResourceNotFoundException;
 import com.project.schoolmanagment.payload.mappers.MeetingMapper;
-import com.project.schoolmanagment.payload.messages.ErrorMessages;
 import com.project.schoolmanagment.payload.messages.SuccessMessages;
 import com.project.schoolmanagment.payload.request.businnes.MeetingRequest;
 import com.project.schoolmanagment.payload.response.businnes.MeetingResponse;
 import com.project.schoolmanagment.payload.response.businnes.ResponseMessage;
 import com.project.schoolmanagment.repository.businnes.MeetingRepository;
+import com.project.schoolmanagment.service.helper.MeetingHelper;
 import com.project.schoolmanagment.service.helper.MethodHelper;
 import com.project.schoolmanagment.service.user.UserService;
 import com.project.schoolmanagment.service.validator.DateTimeValidator;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -33,6 +28,7 @@ public class MeetingService {
   private final MethodHelper methodHelper;
   private final DateTimeValidator dateTimeValidator;
   private final MeetingMapper meetingMapper;
+  private final MeetingHelper meetingHelper;
 
   public ResponseMessage<MeetingResponse> saveMeeting(HttpServletRequest httpServletRequest,
       MeetingRequest meetingRequest) {
@@ -43,7 +39,7 @@ public class MeetingService {
     dateTimeValidator.checkTimeWithException(meetingRequest.getStartTime(),meetingRequest.getStopTime());
     
     //validate meeting conflicts
-    checkMeetingConflicts(meetingRequest.getStudentIds(),
+    meetingHelper.checkMeetingConflicts(meetingRequest.getStudentIds(),
         teacher.getId(), 
         meetingRequest.getDate(),
         meetingRequest.getStartTime(),
@@ -59,61 +55,70 @@ public class MeetingService {
         .returnBody(meetingMapper.mapMeetToMeetingResponse(savedMeet))
         .httpStatus(HttpStatus.OK)
         .build();
-    
-    
-  }
-  
-  private void checkMeetingConflicts(List<Long>studentIdList,Long teacherId, LocalDate meetingDate, LocalTime startTime, LocalTime stopTime){
-
-    List<Meet>existingMeetings = new ArrayList<>();
-    for (Long id:studentIdList){
-      //check student really exist + is a student
-      methodHelper.checkRole(methodHelper.isUserExist(id), RoleType.STUDENT);
-      existingMeetings.addAll(meetingRepository.findByStudentList_IdEquals(id));
-    }    
-    existingMeetings.addAll(meetingRepository.getByAdvisoryTeacher_IdEquals(teacherId));
-    
-    for (Meet meet:existingMeetings){
-      LocalTime existingStartTime = meet.getStartTime();
-      LocalTime existingStopTime = meet.getStopTime();
-      
-      if(meet.getDate().equals(meetingDate) && (		
-          (startTime.isAfter(existingStartTime) && startTime.isBefore(existingStopTime)) ||
-          (stopTime.isAfter(existingStartTime) && stopTime.isBefore(existingStopTime)) ||
-          (startTime.isBefore(existingStartTime) && stopTime.isAfter(existingStopTime)) ||
-          (startTime.equals(existingStartTime) || stopTime.equals(existingStopTime))
-      )) {
-        throw new ConflictException(ErrorMessages.MEET_HOURS_CONFLICT);
-      }
-    }
-    
-  }
+  } 
 
 
   public ResponseMessage<MeetingResponse> updateMeeting(MeetingRequest meetingRequest,
       Long meetingId, HttpServletRequest request) {
-    Meet meet = isMeetingExistById(meetingId);
+    Meet meet = meetingHelper.isMeetingExistById(meetingId);
     //validating teacher and meeting are matched
-    isMeetingMatchedWithTeacher(meet,request);
-    dateTimeValidator.checkTimeWithException();
+    meetingHelper.isMeetingMatchedWithTeacher(meet,request);
+    dateTimeValidator.checkTimeWithException(meetingRequest.getStartTime(),meetingRequest.getStopTime());
+    meetingHelper.checkMeetingConflicts(meetingRequest.getStudentIds(),
+        meet.getAdvisoryTeacher().getId(),
+        meetingRequest.getDate(),
+        meetingRequest.getStartTime(),
+        meetingRequest.getStopTime());
     
-    
-    
+    List<User>students = methodHelper.getUserList(meetingRequest.getStudentIds());
+    Meet meetToUpdate = meetingMapper.mapMeetingRequestToMeet(meetingRequest);
+    //need to set missing parameters
+    meetToUpdate.setStudentList(students);
+    meetToUpdate.setAdvisoryTeacher(meet.getAdvisoryTeacher());
+    meetToUpdate.setId(meetingId);
+    Meet updatedMeet = meetingRepository.save(meetToUpdate);
+    return ResponseMessage.<MeetingResponse>builder()
+        .message(SuccessMessages.MEET_SAVE)
+        .returnBody(meetingMapper.mapMeetToMeetingResponse(updatedMeet))
+        .httpStatus(HttpStatus.OK)
+        .build();
   }
-  
-  
-  public Meet isMeetingExistById(Long id){
-    return meetingRepository.findById(id)
-        .orElseThrow(
-            ()->new ResourceNotFoundException(String.format(ErrorMessages.MEET_NOT_FOUND_MESSAGE,id)));
+
+
+  public List<MeetingResponse> getAll() {
+    return meetingRepository.findAll()
+        .stream()
+        .map(meetingMapper::mapMeetToMeetingResponse)
+        .collect(Collectors.toList());   
   }
-  
-  private void isMeetingMatchedWithTeacher(Meet meet, HttpServletRequest httpServletRequest){
-    String username = (String) httpServletRequest.getAttribute("username");    
+
+  public ResponseMessage deleteById(Long id) {
+    meetingHelper.isMeetingExistById(id);    
+    meetingRepository.deleteById(id);
+    return ResponseMessage.builder()
+        .message(SuccessMessages.MEET_DELETE)
+        .httpStatus(HttpStatus.OK)
+        .build();
+  }
+
+  public List<MeetingResponse> getAllMeetingsByLoggedInTeacher(
+      HttpServletRequest httpServletRequest) {
+    String username = (String) httpServletRequest.getAttribute("username");
     User teacher = methodHelper.loadUserByName(username);
-    methodHelper.checkIsAdvisor(teacher);    
-    if(!meet.getAdvisoryTeacher().getId().equals(teacher.getAdvisorTeacherId())){
-      throw new BadRequestException(ErrorMessages.NOT_PERMITTED_METHOD_MESSAGE);
-    }
+    methodHelper.checkIsAdvisor(teacher);
+    return meetingRepository.getByAdvisoryTeacher_IdEquals(teacher.getId())
+        .stream()
+        .map(meetingMapper::mapMeetToMeetingResponse)
+        .collect(Collectors.toList());    
+  }
+
+  public List<MeetingResponse> getAllMeetingsByLoggedInStudent(
+      HttpServletRequest httpServletRequest) {
+    String username = (String) httpServletRequest.getAttribute("username");
+    User loggedInStudent = methodHelper.loadUserByName(username);
+    return meetingRepository.findByStudentList_IdEquals(loggedInStudent.getId())
+        .stream()
+        .map(meetingMapper::mapMeetToMeetingResponse)
+        .collect(Collectors.toList());
   }
 }

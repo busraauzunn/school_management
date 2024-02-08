@@ -4,10 +4,14 @@ import com.project.schoolmanagment.payload.request.businnes.MeetingRequest;
 import com.project.schoolmanagment.payload.response.businnes.MeetingResponse;
 import com.project.schoolmanagment.payload.response.businnes.ResponseMessage;
 import com.project.schoolmanagment.service.businnes.MeetingService;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,6 +40,31 @@ public class MeetingController {
       HttpServletRequest request){
     return meetingService.updateMeeting(meetingRequest,meetingId,request);
   }
+
+  @PreAuthorize("hasAnyAuthority('Admin')")
+  @GetMapping("/getAll")
+  public List<MeetingResponse>getAll(){
+    return meetingService.getAll();
+  }
+
+  @PreAuthorize("hasAnyAuthority('Admin','Teacher')")
+  @DeleteMapping("/delete/{id}")
+  public ResponseMessage deleteById(@PathVariable Long id){
+    return meetingService.deleteById(id);
+  }
+
+  @PreAuthorize("hasAnyAuthority('Teacher')")
+  @GetMapping("/getAllByTeacher")
+  public ResponseEntity<List<MeetingResponse>>getAllMeetingsByLoggedInTeacher(HttpServletRequest httpServletRequest){
+    return ResponseEntity.ok(meetingService.getAllMeetingsByLoggedInTeacher(httpServletRequest));
+  }
+
+  @PreAuthorize("hasAnyAuthority('Student')")
+  @GetMapping("/getAllByStudent")
+  public ResponseEntity<List<MeetingResponse>>getAllMeetingsByLoggedInStudent(HttpServletRequest httpServletRequest){
+    return ResponseEntity.ok(meetingService.getAllMeetingsByLoggedInStudent(httpServletRequest));
+  }
+  
   
   
   
