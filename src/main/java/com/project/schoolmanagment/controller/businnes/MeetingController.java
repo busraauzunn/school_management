@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +26,15 @@ public class MeetingController {
   public ResponseMessage<MeetingResponse>saveMeeting(HttpServletRequest httpServletRequest,
       @RequestBody @Valid MeetingRequest meetingRequest){
     return meetingService.saveMeeting(httpServletRequest,meetingRequest);
+  }
+
+  @PreAuthorize("hasAnyAuthority('Teacher')")
+  @PostMapping("/update/{meetingId}")
+  public ResponseMessage<MeetingResponse>updateMeeting(
+      @RequestBody @Valid MeetingRequest meetingRequest,
+      @PathVariable Long meetingId,
+      HttpServletRequest request){
+    return meetingService.updateMeeting(meetingRequest,meetingId,request);
   }
   
   

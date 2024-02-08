@@ -3,6 +3,7 @@ package com.project.schoolmanagment.payload.request.businnes;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -37,5 +38,5 @@ public class MeetingRequest {
   private LocalTime stopTime;
 
   @NotNull(message = "Please select students")
-  private Long[] studentIds;
+  private List<Long> studentIds;
 }

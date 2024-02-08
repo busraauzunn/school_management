@@ -38,4 +38,8 @@ public interface UserRepository extends JpaRepository<User,Long> {
   
   @Query("select max (u.studentNumber) from User u")
   int getMaxStudentNumber();
+  
+  
+  @Query("select u from User u where u.id IN :idList")
+  List<User>findByIdList(List<Long>idList);
 }

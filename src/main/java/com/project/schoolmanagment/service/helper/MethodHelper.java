@@ -7,6 +7,7 @@ import com.project.schoolmanagment.exception.ConflictException;
 import com.project.schoolmanagment.exception.ResourceNotFoundException;
 import com.project.schoolmanagment.payload.messages.ErrorMessages;
 import com.project.schoolmanagment.repository.user.UserRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
@@ -72,6 +73,11 @@ public class MethodHelper {
     if(!user.getUserRole().getRoleType().equals(roleType)){
       throw new ConflictException(ErrorMessages.NOT_HAVE_EXPECTED_ROLE_USER);
     }
+  }
+  
+  
+  public List<User>getUserList(List<Long> idList){
+    return userRepository.findByIdList(idList);
   }
 
 }
