@@ -1,8 +1,11 @@
 package com.project.schoolmanagment.payload.mappers;
 
+import com.project.schoolmanagment.entity.concretes.businnes.EducationTerm;
+import com.project.schoolmanagment.entity.concretes.businnes.Lesson;
 import com.project.schoolmanagment.entity.concretes.businnes.StudentInfo;
 import com.project.schoolmanagment.entity.enums.Note;
 import com.project.schoolmanagment.payload.request.businnes.StudentInfoRequest;
+import com.project.schoolmanagment.payload.request.businnes.StudentInfoUpdateRequest;
 import com.project.schoolmanagment.payload.response.businnes.StudentInfoResponse;
 import com.project.schoolmanagment.payload.response.user.StudentResponse;
 import lombok.Data;
@@ -43,6 +46,27 @@ public class StudentInfoMapper {
         .note(studentInfo.getLetterGrade())
         .average(studentInfo.getExamAverage())
         .studentResponse(userMapper.mapUserToStudentResponse(studentInfo.getStudent()))
+        .build();
+  }
+  
+  public StudentInfo mapStudentInfoUpdateRequestToStudentInfo(
+      StudentInfoUpdateRequest studentInfoUpdateRequest,
+      Long studentInfoRequestId,
+      Lesson lesson,
+      EducationTerm educationTerm,
+      Note note,
+      Double average){
+    
+    return StudentInfo.builder()
+        .id(studentInfoRequestId)
+        .infoNote(studentInfoUpdateRequest.getInfoNote())
+        .midtermExam(studentInfoUpdateRequest.getMidtermExam())
+        .finalExam(studentInfoUpdateRequest.getFinalExam())
+        .absentee(studentInfoUpdateRequest.getAbsentee())
+        .lesson(lesson)
+        .educationTerm(educationTerm)
+        .examAverage(average)
+        .letterGrade(note)
         .build();
   }
   

@@ -2,19 +2,31 @@ package com.project.schoolmanagment.service.businnes;
 
 import com.project.schoolmanagment.entity.concretes.businnes.EducationTerm;
 import com.project.schoolmanagment.entity.concretes.businnes.Lesson;
+import com.project.schoolmanagment.entity.concretes.businnes.StudentInfo;
 import com.project.schoolmanagment.entity.concretes.user.User;
 import com.project.schoolmanagment.entity.enums.Note;
 import com.project.schoolmanagment.entity.enums.RoleType;
 import com.project.schoolmanagment.exception.ConflictException;
+import com.project.schoolmanagment.exception.ResourceNotFoundException;
+import com.project.schoolmanagment.payload.mappers.StudentInfoMapper;
 import com.project.schoolmanagment.payload.messages.ErrorMessages;
+import com.project.schoolmanagment.payload.messages.SuccessMessages;
 import com.project.schoolmanagment.payload.request.businnes.StudentInfoRequest;
+import com.project.schoolmanagment.payload.request.businnes.StudentInfoUpdateRequest;
 import com.project.schoolmanagment.payload.response.businnes.ResponseMessage;
 import com.project.schoolmanagment.payload.response.businnes.StudentInfoResponse;
 import com.project.schoolmanagment.repository.businnes.StudentInfoRepository;
 import com.project.schoolmanagment.service.helper.MethodHelper;
+import com.project.schoolmanagment.service.helper.PageableHelper;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,6 +37,8 @@ public class StudentInfoService {
   private final StudentInfoRepository studentInfoRepository;
   private final LessonService lessonService;
   private final EducationTermService educationTermService;
+  private final StudentInfoMapper studentInfoMapper;
+  private final PageableHelper pageableHelper;
   @Value("${midterm.exam.impact.percentage}")
   private Double midtermExamPercentage;
   @Value("${final.exam.impact.percentage}")
@@ -45,6 +59,27 @@ public class StudentInfoService {
     EducationTerm educationTerm = educationTermService.isEducationTermExist(
         studentInfoRequest.getEducationTermId());
     validateLessonDuplication(studentInfoRequest.getStudentId(), lesson.getLessonName());
+    Note note = checkLetterGrade(calculateExamAverage(studentInfoRequest.getMidtermExam(),
+        studentInfoRequest.getFinalExam()));
+
+    StudentInfo studentInfo = studentInfoMapper.mapStudentInfoRequestToStudentInfo(
+        studentInfoRequest,
+        note,
+        calculateExamAverage(studentInfoRequest.getMidtermExam(),
+            studentInfoRequest.getFinalExam())
+    );
+    //set missing properties
+    studentInfo.setStudent(student);
+    studentInfo.setEducationTerm(educationTerm);
+    studentInfo.setTeacher(teacher);
+    studentInfo.setLesson(lesson);
+    StudentInfo savedStudentInfo = studentInfoRepository.save(studentInfo);
+    
+    return ResponseMessage.<StudentInfoResponse>builder()
+        .message(SuccessMessages.STUDENT_INFO_SAVE)
+        .returnBody(studentInfoMapper.mapStudentInfoToStudentInfoResponse(savedStudentInfo))
+        .httpStatus(HttpStatus.OK)
+        .build();
   }
   
   //each student can have only one studentInfo entry related to a lesson
@@ -75,5 +110,74 @@ public class StudentInfoService {
     } else {
       return Note.AA;
     }
+  }
+  
+  public StudentInfo isStudentInfoExist(Long id){
+    Optional<StudentInfo> studentInfoOptional = studentInfoRepository.findById(id);
+    if (studentInfoOptional.isPresent()) {
+      return studentInfoOptional.get();
+    } else {
+      throw new ResourceNotFoundException(String.format(ErrorMessages.STUDENT_INFO_NOT_FOUND,id));
+    }
+  }
+
+  public ResponseMessage<StudentInfoResponse> updateStudentInfo(
+      StudentInfoUpdateRequest studentInfoUpdateRequest, Long studentInfoId) {
+    //validate lesson existence
+    Lesson lesson = lessonService.isLessonExistById(studentInfoUpdateRequest.getLessonId());
+    
+    StudentInfo studentInfo = isStudentInfoExist(studentInfoId);
+    //validate education term existence
+    EducationTerm educationTerm = educationTermService.isEducationTermExist(studentInfoUpdateRequest.getEducationTermId());
+    
+    Double noteAverage = calculateExamAverage(studentInfoUpdateRequest.getMidtermExam(),
+        studentInfoUpdateRequest.getFinalExam());
+    
+    Note note = checkLetterGrade(noteAverage);
+    
+    StudentInfo studentInfoToUpdate = studentInfoMapper.mapStudentInfoUpdateRequestToStudentInfo(
+        studentInfoUpdateRequest,
+        studentInfoId,
+        lesson,
+        educationTerm,
+        note,
+        noteAverage);
+    //we are not updating teacher and student
+    studentInfoToUpdate.setStudent(studentInfo.getStudent());
+    studentInfoToUpdate.setTeacher(studentInfo.getTeacher());
+    StudentInfo updatedStudentInfo = studentInfoRepository.save(studentInfoToUpdate);
+    return ResponseMessage.<StudentInfoResponse>builder()
+        .message(SuccessMessages.STUDENT_INFO_UPDATE)
+        .httpStatus(HttpStatus.OK)
+        .returnBody(studentInfoMapper.mapStudentInfoToStudentInfoResponse(updatedStudentInfo))
+        .build();
+  }
+
+  public ResponseMessage deleteStudentInfo(Long studentInfo) {
+    isStudentInfoExist(studentInfo);
+    studentInfoRepository.deleteById(studentInfo);
+    return ResponseMessage.builder()
+        .message(SuccessMessages.STUDENT_INFO_DELETE)
+        .httpStatus(HttpStatus.OK)
+        .build();
+  }
+
+  public Page<StudentInfoResponse> findStudentInfoByPage(int page, int size, String sort,
+      String type) {
+    Pageable pageable = pageableHelper.getPageableWithProperties(page, size, sort, type);
+    return studentInfoRepository.findAll(pageable)
+        .map(studentInfoMapper::mapStudentInfoToStudentInfoResponse);
+  }
+
+  public StudentInfoResponse findStudentInfoById(Long studentInfoId) {    
+    return studentInfoMapper.mapStudentInfoToStudentInfoResponse(isStudentInfoExist(studentInfoId));    
+  }
+
+  public List<StudentInfoResponse> getByStudentId(Long studentId) {
+    User student = methodHelper.isUserExist(studentId);
+    methodHelper.checkRole(student,RoleType.STUDENT);    
+    return studentInfoRepository.findByStudentId(studentId)
+        .stream().map(studentInfoMapper::mapStudentInfoToStudentInfoResponse)
+        .collect(Collectors.toList());
   }
 }
