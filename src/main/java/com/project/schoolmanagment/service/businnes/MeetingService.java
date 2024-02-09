@@ -10,14 +10,16 @@ import com.project.schoolmanagment.payload.response.businnes.ResponseMessage;
 import com.project.schoolmanagment.repository.businnes.MeetingRepository;
 import com.project.schoolmanagment.service.helper.MeetingHelper;
 import com.project.schoolmanagment.service.helper.MethodHelper;
+import com.project.schoolmanagment.service.helper.PageableHelper;
 import com.project.schoolmanagment.service.user.UserService;
 import com.project.schoolmanagment.service.validator.DateTimeValidator;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -29,6 +31,7 @@ public class MeetingService {
   private final DateTimeValidator dateTimeValidator;
   private final MeetingMapper meetingMapper;
   private final MeetingHelper meetingHelper;
+  private final PageableHelper pageableHelper;
 
   public ResponseMessage<MeetingResponse> saveMeeting(HttpServletRequest httpServletRequest,
       MeetingRequest meetingRequest) {
@@ -120,5 +123,21 @@ public class MeetingService {
         .stream()
         .map(meetingMapper::mapMeetToMeetingResponse)
         .collect(Collectors.toList());
+  }
+
+  public Page<MeetingResponse> getAllByPage(int page, int size) {
+    Pageable pageable = pageableHelper.getPageableWithProperties(page,size);
+    return meetingRepository.findAll(pageable).map(meetingMapper::mapMeetToMeetingResponse);    
+  }
+
+
+  public Page<MeetingResponse> getAllMeetByPageByTeacher(int page, int size,
+      HttpServletRequest request) {
+    String username = (String) request.getAttribute("username");
+    User teacher = methodHelper.loadUserByName(username);
+    methodHelper.checkIsAdvisor(teacher);
+    Pageable pageable = pageableHelper.getPageableWithProperties(page,size);
+    return meetingRepository.findByAdvisoryTeacher_IdEquals(teacher.getId(), pageable)
+        .map(meetingMapper::mapMeetToMeetingResponse);
   }
 }
