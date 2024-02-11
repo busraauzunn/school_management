@@ -73,6 +73,26 @@ public class StudentInfoController {
   public ResponseEntity<List<StudentInfoResponse>>getByStudentId(@PathVariable Long studentId){
     return ResponseEntity.ok(studentInfoService.getByStudentId(studentId));
   }
+
+  @PreAuthorize("hasAnyAuthority('Teacher')")
+  @GetMapping("/getAllByTeacher")
+  public ResponseEntity<Page<StudentInfoResponse>> getAllByTeacher(
+      HttpServletRequest httpServletRequest,
+      @RequestParam(value = "page",defaultValue = "0") int page,
+      @RequestParam(value = "size",defaultValue = "10") int size){
+    return ResponseEntity.ok(studentInfoService.getAllByTeacher(httpServletRequest, page, size));
+  }
+
+  @PreAuthorize("hasAnyAuthority('Student')")
+  @GetMapping("/getAllByStudent")
+  public ResponseEntity<Page<StudentInfoResponse>> getAllByStudent(
+      HttpServletRequest httpServletRequest,
+      @RequestParam(value = "page",defaultValue = "0") int page,
+      @RequestParam(value = "size",defaultValue = "10") int size){
+    return ResponseEntity.ok(studentInfoService.getAllByStudent(httpServletRequest, page, size));
+  }
+  
+  
   
   
   

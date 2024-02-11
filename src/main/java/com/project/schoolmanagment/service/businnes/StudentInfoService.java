@@ -44,6 +44,14 @@ public class StudentInfoService {
   @Value("${final.exam.impact.percentage}")
   private Double finalExamPercentage;
 
+  public Page<StudentInfoResponse> getAllByTeacher(HttpServletRequest httpServletRequest,
+      int page, int size) {
+    Pageable pageable = pageableHelper.getPageableWithProperties(page,size);
+    String username = (String) httpServletRequest.getAttribute("username");
+    return studentInfoRepository.findByTeacherUsername(username,pageable)
+        .map(studentInfoMapper::mapStudentInfoToStudentInfoResponse);
+  }
+
   public ResponseMessage<StudentInfoResponse> saveStudentInfo(HttpServletRequest httpServletRequest,
       StudentInfoRequest studentInfoRequest) {
     
@@ -179,5 +187,13 @@ public class StudentInfoService {
     return studentInfoRepository.findByStudentId(studentId)
         .stream().map(studentInfoMapper::mapStudentInfoToStudentInfoResponse)
         .collect(Collectors.toList());
+  }
+
+  public Page<StudentInfoResponse> getAllByStudent(HttpServletRequest httpServletRequest, int page,
+      int size) {
+    Pageable pageable = pageableHelper.getPageableWithProperties(page,size);
+    String username = (String) httpServletRequest.getAttribute("username");
+    return studentInfoRepository.findByStudentUsername(username,pageable)
+        .map(studentInfoMapper::mapStudentInfoToStudentInfoResponse);
   }
 }
