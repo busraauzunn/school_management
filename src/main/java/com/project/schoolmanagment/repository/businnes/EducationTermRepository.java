@@ -21,3 +21,7 @@ public interface EducationTermRepository extends JpaRepository<EducationTerm,Lon
   List<EducationTerm>findByYear(int year);
 
 }
+
+
+
+

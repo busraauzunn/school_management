@@ -15,7 +15,7 @@ import com.project.schoolmanagment.service.user.UserService;
 import com.project.schoolmanagment.service.validator.DateTimeValidator;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

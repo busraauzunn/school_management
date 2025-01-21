@@ -44,6 +44,8 @@ public class JwtUtils {
    *
    * @param username the username used as the subject of the JWT
    * @return the generated JWT token
+   * While the buildTokenFromUsername method is responsible for constructing the JWT token itself using a username,
+   * the generateJwtToken method abstracts away the details of how the username is obtained and how the token is built.
    */
   private String buildTokenFromUsername(String username){
     return Jwts.builder()

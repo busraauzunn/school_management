@@ -30,6 +30,9 @@ public class SchoolManagementApplication implements CommandLineRunner {
     }
 
     @Override
+    //for tables like userrole (or any tables representing static data that doesn't change often), it's essential to have
+    // predefined entries available in the table before interacting with them. This is because these tables typically represent
+    // reference data that the application relies on for its functionality.
     public void run(String... args) throws Exception {
         if(userRoleService.getAllUserRole().isEmpty()){
             //admin

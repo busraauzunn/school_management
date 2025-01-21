@@ -3,10 +3,10 @@ package com.project.schoolmanagment.security.jwt;
 import com.project.schoolmanagment.security.service.UserDetailServiceImpl;
 import com.project.schoolmanagment.security.service.UserDetailsImpl;
 import java.io.IOException;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,18 +40,18 @@ public class AuthTokenFilter extends OncePerRequestFilter {
       String jwt = parseJwt(request);
       // 2) validate JWT
       if(jwt !=null && jwtUtils.validateJwtToken(jwt)){
-        //3) we need username for to get data 
+        //3) we need username to get data
         String userName = jwtUtils.getUsernameFromJwtToken(jwt);
         // 4) check DB and find the user and upgrade it with userDetails
         UserDetails userDetails = userDetailService.loadUserByUsername(userName);
         // 5) we are setting attribute prop with username
         request.setAttribute("username",userName);
-        // 6) we have userdeatils object then we have to send this information to
+        // 6) we have userDetails object then we have to send this information to
         // SECURITY CONTEXT
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
             userDetails,null,userDetails.getAuthorities());
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        // 7) noew spring contect know who is logged in.
+        // 7) now spring context knows who is logged in.
         SecurityContextHolder.getContext().setAuthentication(authentication);        
       }
     } catch (UsernameNotFoundException error){

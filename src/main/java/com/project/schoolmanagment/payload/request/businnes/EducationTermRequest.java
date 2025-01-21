@@ -3,7 +3,7 @@ package com.project.schoolmanagment.payload.request.businnes;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.project.schoolmanagment.entity.enums.Term;
 import java.time.LocalDate;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

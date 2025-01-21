@@ -7,8 +7,8 @@ import com.project.schoolmanagment.payload.response.businnes.ResponseMessage;
 import com.project.schoolmanagment.payload.response.user.UserResponse;
 import com.project.schoolmanagment.service.user.UserService;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -69,9 +69,10 @@ public class UserController {
 
   @PreAuthorize("hasAnyAuthority('Admin','Dean','ViceDean','Teacher')")
   @PatchMapping("/updateUser")
-  public ResponseEntity<String>updateUser(@RequestBody @Valid
-      UserRequestWithoutPassword userRequestWithoutPassword,
-      HttpServletRequest request) {
+  public ResponseEntity<String>updateUser(
+          @RequestBody @Valid UserRequestWithoutPassword userRequestWithoutPassword,
+          HttpServletRequest request) {
+
     return ResponseEntity.ok(userService.updateUser(userRequestWithoutPassword,request));
   }
 

@@ -4,15 +4,19 @@ import com.project.schoolmanagment.security.jwt.AuthEntryPointJwt;
 import com.project.schoolmanagment.security.jwt.AuthTokenFilter;
 import com.project.schoolmanagment.security.service.UserDetailServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -22,7 +26,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @EnableWebSecurity
 @Configuration
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
   
@@ -33,22 +37,35 @@ public class WebSecurityConfig {
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     //CORS (Cross-Origin Resource Sharing) and CSRF (Cross-Site Request Forgery) is disabled
-    http.cors().and()
-        .csrf().disable()
+    http.csrf(AbstractHttpConfigurer::disable).cors(Customizer.withDefaults())
+            .exceptionHandling((exception -> exception.authenticationEntryPoint(authEntryPointJwt)))
+            .sessionManagement(sessionManagementCustomizer -> sessionManagementCustomizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth.requestMatchers((AUTH_WHITE_LIST)).permitAll().anyRequest().authenticated());
+            http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
+
+            http.authenticationProvider(daoAuthenticationProvider());
+            http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+
         //configure the exception handler
-        .exceptionHandling().authenticationEntryPoint(authEntryPointJwt).and()
+
+
+
+
+
+
+
         //configure the session management
-        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+       // .sessionManagement(sessionManagementCustomizer -> sessionManagementCustomizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         //configure white list 
-        .authorizeRequests().antMatchers(AUTH_WHITE_LIST).permitAll()
-        //configure authentication all rest of the URL.s
-        .anyRequest().authenticated();
+//        .authorizeHttpRequests(auth ->antMatchers(AUTH_WHITE_LIST).permitAll()
+       // configure authentication all rest of the URL.s.anyRequest().authenticated();
     //configure the frames to be sure from the same origin
-    http.headers().frameOptions().sameOrigin();
+
+    //http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin());
+
     //configure the authentication provider
-    http.authenticationProvider(daoAuthenticationProvider());
-    //configure JWT token handling
-    http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+   //http.authenticationProvider(daoAuthenticationProvider());
+
     return http.build();    
   }
   
@@ -99,10 +116,10 @@ public class WebSecurityConfig {
    */
   private static final String[] AUTH_WHITE_LIST = {
       "/v3/api-docs/**", 
-      "swagger-ui.html", 
+      "/swagger-ui.html",
       "/swagger-ui/**", 
       "/",
-      "index.html",
+      "/index.html",
       "/images/**",
       "/css/**",
       "/js/**",

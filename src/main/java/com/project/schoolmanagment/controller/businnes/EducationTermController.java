@@ -6,7 +6,8 @@ import com.project.schoolmanagment.payload.response.businnes.ResponseMessage;
 import com.project.schoolmanagment.service.businnes.EducationTermService;
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.Valid;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,7 +37,6 @@ public class EducationTermController {
     return educationTermService.saveEducationTerm(educationTermRequest);
   }
 
-  //TODO YUNUS WILL IMPLEMENT THIS
   @PreAuthorize("hasAnyAuthority('Admin','Dean','ViceDean','Teacher')")
   @GetMapping("/getAll")
   public List<EducationTermResponse>getAllEducationTerms(){

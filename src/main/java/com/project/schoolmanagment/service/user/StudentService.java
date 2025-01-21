@@ -17,7 +17,7 @@ import com.project.schoolmanagment.service.helper.MethodHelper;
 import com.project.schoolmanagment.service.validator.DateTimeValidator;
 import com.project.schoolmanagment.service.validator.UniquePropertyValidator;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

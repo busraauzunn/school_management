@@ -1,9 +1,7 @@
 package com.project.schoolmanagment.contactmessage.dto;
 
 import java.io.Serializable;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

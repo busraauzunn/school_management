@@ -19,12 +19,17 @@ import com.project.schoolmanagment.service.validator.UniquePropertyValidator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
 @RequiredArgsConstructor
@@ -140,7 +145,7 @@ public class UserService {
    * @return The success message indicating that the user has been updated.
    */
   public String updateUser(UserRequestWithoutPassword userRequest,
-      HttpServletRequest request) {
+                           HttpServletRequest request) {
 
     String userName = (String) request.getAttribute("username");
     User user = userRepository.findByUsername(userName);
@@ -214,8 +219,9 @@ public class UserService {
 
     RoleType loggedInUserRole = loggedInUser.getUserRole().getRoleType();
     RoleType deletedUserRole = user.getUserRole().getRoleType();
+
     if (loggedInUser.getBuiltIn()) {
-      //buildIn users can not neither be updated nor deleted.
+      //buildIn users can neither be updated nor deleted.
       throw new BadRequestException(ErrorMessages.NOT_PERMITTED_METHOD_MESSAGE);
       //manager can only delete teacher/student/viceDean
     } else if (loggedInUserRole == RoleType.MANAGER) {

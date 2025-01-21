@@ -6,7 +6,7 @@ import com.project.schoolmanagment.payload.response.businnes.LessonResponse;
 import com.project.schoolmanagment.payload.response.businnes.ResponseMessage;
 import com.project.schoolmanagment.service.businnes.LessonService;
 import java.util.Set;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;

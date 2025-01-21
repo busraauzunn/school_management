@@ -3,14 +3,8 @@ package com.project.schoolmanagment.entity.concretes.businnes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.schoolmanagment.entity.concretes.user.User;
 import com.project.schoolmanagment.entity.enums.Note;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
+
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

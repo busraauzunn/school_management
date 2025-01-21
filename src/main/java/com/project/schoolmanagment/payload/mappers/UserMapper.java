@@ -13,7 +13,8 @@ import org.springframework.stereotype.Component;
 public class UserMapper {
   
   private final PasswordEncoder passwordEncoder;
-  
+
+  // converting a BaseUserRequest object into a User object
   public User mapUserRequestToUser(BaseUserRequest userRequest){
     return User.builder()
         .username(userRequest.getUsername())

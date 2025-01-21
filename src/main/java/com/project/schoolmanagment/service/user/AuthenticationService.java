@@ -13,7 +13,7 @@ import com.project.schoolmanagment.security.jwt.JwtUtils;
 import com.project.schoolmanagment.security.service.UserDetailsImpl;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

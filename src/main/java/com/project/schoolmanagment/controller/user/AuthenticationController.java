@@ -6,8 +6,8 @@ import com.project.schoolmanagment.payload.request.authentication.UpdatePassword
 import com.project.schoolmanagment.payload.response.authentication.AuthResponse;
 import com.project.schoolmanagment.payload.response.user.UserResponse;
 import com.project.schoolmanagment.service.user.AuthenticationService;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -6,8 +6,9 @@ import com.project.schoolmanagment.payload.response.businnes.ResponseMessage;
 import com.project.schoolmanagment.service.businnes.LessonProgramService;
 import java.util.List;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -75,17 +76,17 @@ public class LessonProgramController {
     return lessonProgramService.findLessonProgramByPage(page,size,sort,type);
   }
 
-  @PreAuthorize("hasAnyAuthority('Teacher')")
-  @GetMapping("/getAllLessonProgramByTeacher")
-  public Set<LessonProgramResponse>getAllLessonProgramByTeacherUsername(HttpServletRequest httpServletRequest){
-    return lessonProgramService.getAllLessonProgramByUsername(httpServletRequest);
-  }
+ // @PreAuthorize("hasAnyAuthority('Teacher')")
+  //@GetMapping("/getAllLessonProgramByTeacher")
+  //public Set<LessonProgramResponse>getAllLessonProgramByTeacherUsername(HttpServletRequest httpServletRequest){
+   // return lessonProgramService.getAllLessonProgramByUsername(httpServletRequest );
+  //}
 
-  @PreAuthorize("hasAnyAuthority('Student')")
-  @GetMapping("/getAllLessonProgramByStudent")
-  public Set<LessonProgramResponse>getAllLessonProgramByStudent(HttpServletRequest httpServletRequest){
-    return lessonProgramService.getAllLessonProgramByUsername(httpServletRequest);
-  }
+  //@PreAuthorize("hasAnyAuthority('Student')")
+  //@GetMapping("/getAllLessonProgramByStudent")
+  //public Set<LessonProgramResponse>getAllLessonProgramByStudent(HttpServletRequest httpServletRequest){
+  //  return lessonProgramService.getAllLessonProgramByUsername(httpServletRequest);
+  //}
 
   @PreAuthorize("hasAnyAuthority('Admin','Dean','ViceDean')")
   @GetMapping("/getAllLessonProgramByTeacherId/{teacherId}")

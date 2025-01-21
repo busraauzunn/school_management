@@ -65,16 +65,6 @@ public class EducationTermService {
       throw new BadRequestException(ErrorMessages.EDUCATION_TERM_CONFLICT_MESSAGE);
     }
     
-    //TODO try to write a query for this algorithm
-    
-    // 1.start - 1.stop
-    // 2.start - 2.stop
-    
-    // first case 1. education term is earlier than 2 .--> 1.stop  > 2.start
-    // second case  2. education term is earlier than 1. --> 2.stop > 1.start
-    
-    //you should find which one is starting first (stop time) then compare it with second (start time)
-    
   }
   
   private void validateEducationTermsDatesForRequest(EducationTermRequest educationTermRequest){

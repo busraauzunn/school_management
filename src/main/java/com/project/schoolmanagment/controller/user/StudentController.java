@@ -6,8 +6,8 @@ import com.project.schoolmanagment.payload.request.user.StudentUpdateRequestWith
 import com.project.schoolmanagment.payload.response.businnes.ResponseMessage;
 import com.project.schoolmanagment.payload.response.user.StudentResponse;
 import com.project.schoolmanagment.service.user.StudentService;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
