@@ -8,7 +8,7 @@ ARG JAR_FILE=target/*.jar
 
 # Copy the JAR file from the build output to the image
 COPY target/school-managment-b181-0.0.1-SNAPSHOT.jar app.jar
-
+ 
 # Start the application
 CMD ["java", "-jar", "app.jar"]
 
